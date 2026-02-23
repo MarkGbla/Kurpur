@@ -7,10 +7,10 @@ export async function getTransactionsByPrivyUserId(
 ) {
   const sql = getNeonDb();
 
-  const userRows = await sql`
+  const userRows = (await sql`
     SELECT id FROM users WHERE privy_user_id = ${privyUserId} LIMIT 1
-  `;
-  const user = userRows[0] as { id: string } | undefined;
+  `) as { id: string }[];
+  const user = userRows[0];
   if (!user) return { transactions: [], error: "User not found" };
 
   const rows = await sql`
@@ -35,13 +35,13 @@ export async function createTransaction(
 ) {
   const sql = getNeonDb();
 
-  const userRows = await sql`
+  const userRows = (await sql`
     SELECT id FROM users WHERE privy_user_id = ${privyUserId} LIMIT 1
-  `;
-  const user = userRows[0] as { id: string } | undefined;
+  `) as { id: string }[];
+  const user = userRows[0];
   if (!user) return { transaction: null, error: "User not found" };
 
-  const inserted = await sql`
+  const inserted = (await sql`
     INSERT INTO transactions (user_id, type, category, amount, note, status)
     VALUES (
       ${user.id},
@@ -52,8 +52,8 @@ export async function createTransaction(
       'completed'
     )
     RETURNING *
-  `;
+  `) as Transaction[];
 
-  const transaction = inserted[0] as Transaction | undefined;
+  const transaction = inserted[0];
   return { transaction: transaction ?? null, error: undefined };
 }

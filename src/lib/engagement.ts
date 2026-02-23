@@ -63,7 +63,7 @@ export function calculateUsageStreak(
   );
   if (dateSet.size === 0) return 0;
 
-  const sorted = [...dateSet].sort(
+  const sorted = Array.from(dateSet).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
   );
   const mostRecent = sorted[0];

@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      const message = typeof error === "string" ? error : error.message;
+      const message = typeof error === "string" ? error : (error as Error).message;
       return NextResponse.json(
         { error: message },
         { status: message === "User not found" ? 404 : 500 }

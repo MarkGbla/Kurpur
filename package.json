@@ -14,6 +14,7 @@
     "prepare": "node -e \"try{require('child_process').execSync('npx husky install',{stdio:'ignore'});}catch(e){process.exit(0)}\""
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@neondatabase/serverless": "^1.0.2",
     "@privy-io/react-auth": "^3.14.1",
     "@privy-io/server-auth": "^1.32.5",
@@ -30,6 +31,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.5.4",
+    "web-push": "^3.6.7",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -37,6 +39,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/web-push": "^3.6.4",
     "eslint": "^8",
     "eslint-config-next": "14.2.18",
     "husky": "^9.0.11",

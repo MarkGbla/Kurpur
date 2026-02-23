@@ -5,7 +5,8 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { LogOut, MessageCircle } from "lucide-react";
+import { LogOut, MessageCircle, Bell } from "lucide-react";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { SUGGESTED_BUDGET_PERCENT, BUDGET_PERCENT_OPTIONS } from "@/constants/budget";
@@ -38,6 +39,13 @@ export default function SettingsPage() {
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
   const [feedbackError, setFeedbackError] = useState<string | null>(null);
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
+
+  const {
+    status: pushStatus,
+    message: pushMessage,
+    subscribe: subscribeToPush,
+    supported: pushSupported,
+  } = usePushNotifications({ getAccessToken: getAccessToken ?? undefined });
 
   const income = incomeThisMonth(transactions);
   const suggestedBudget = income > 0 ? Math.floor(income * (suggestedPercent / 100)) : 0;
@@ -227,6 +235,48 @@ export default function SettingsPage() {
 
       {loadError && (
         <p className="mt-2 text-sm text-warning">{loadError}</p>
+      )}
+
+      {pushSupported && (
+        <div className="mt-6 space-y-4 rounded-2xl bg-surface-card p-4">
+          <p className="text-xs text-muted">Push notifications</p>
+          <p className="text-sm text-muted">
+            Get daily summary and reminders (e.g. evening recap). Max 2 per day.
+          </p>
+          {pushMessage && (
+            <p className={cn(
+              "text-sm",
+              pushStatus === "subscribed" ? "text-success" : pushStatus === "error" || pushStatus === "denied" ? "text-warning" : "text-muted"
+            )}>
+              {pushMessage}
+            </p>
+          )}
+          {(pushStatus === "prompt" || pushStatus === "error" || pushStatus === "unavailable" || pushStatus === "loading") && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => subscribeToPush()}
+              disabled={pushStatus === "loading"}
+              className="gap-2"
+            >
+              <Bell className="h-4 w-4" strokeWidth={1.5} />
+              {pushStatus === "loading" ? "Enabling…" : pushStatus === "unavailable" ? "Try enable (install PWA first)" : "Enable notifications"}
+            </Button>
+          )}
+          {pushStatus === "subscribed" && (
+            <p className="flex items-center gap-2 text-sm text-success">
+              <Bell className="h-4 w-4" strokeWidth={1.5} />
+              Notifications are on. You can disable them in your browser settings.
+            </p>
+          )}
+          {pushStatus === "unsupported" && (
+            <p className="text-sm text-muted">Not available in this browser.</p>
+          )}
+          {pushStatus === "denied" && (
+            <p className="text-sm text-muted">Allow notifications in your browser to re-enable.</p>
+          )}
+        </div>
       )}
 
       <div className="mt-8 flex flex-col gap-3">

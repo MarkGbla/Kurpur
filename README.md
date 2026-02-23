@@ -5,7 +5,7 @@
 ## Tech Stack
 
 - **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, ShadCN UI, Framer Motion
-- **Backend:** Supabase (PostgreSQL, Edge Functions)
+- **Backend:** Neon (PostgreSQL)
 - **Auth:** Privy (Passwordless)
 - **Deploy:** Vercel
 
@@ -26,7 +26,7 @@ docker build -t kurpur .
 docker run -p 3000:3000 --env-file .env.local kurpur
 ```
 
-Then open http://localhost:3000. Create `.env.local` first with your Supabase and Privy keys.
+Then open http://localhost:3000. Create `.env.local` first with your Neon and Privy keys.
 
 ---
 
@@ -54,15 +54,14 @@ cp .env.example .env.local
 
 Required variables:
 
-- `NEXT_PUBLIC_SUPABASE_URL` – Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` – Supabase anon key
-- `SUPABASE_SERVICE_ROLE_KEY` – Supabase service role key (server-side only)
+- `DATABASE_URL` – Neon PostgreSQL connection string (from [neon.tech](https://neon.tech))
 - `NEXT_PUBLIC_PRIVY_APP_ID` – Privy app ID
+- `PRIVY_APP_SECRET` – Privy app secret (server-side only)
 
-### 3. Set up Supabase
+### 3. Set up Neon
 
-1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Run the migration in `supabase/migrations/001_initial_schema.sql` via the Supabase SQL Editor
+1. Create a project at [neon.tech](https://neon.tech)
+2. Run the schema in `neon/schema.sql` in the Neon SQL Editor
 
 ### 4. Set up Privy
 

@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #000000;
+    --surface: #111111;
+    --surface-card: #1a1a1a;
+    --accent: #ffffff;
+    --muted: #8a8a8a;
+    --success: #22c55e;
+    --warning: #f59e0b;
+  }
+
+  * {
+    @apply border-muted/20;
+  }
+
+  body {
+    @apply bg-background text-accent antialiased;
+  }
+}

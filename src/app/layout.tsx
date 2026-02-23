@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   title: "Kurpur - Daily Financial Companion",
   description: "Build disciplined financial habits. Simple. Premium. Essential.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/logo.svg",
+    apple: "/logo.svg",
+  },
 };
 
 export const viewport: Viewport = {

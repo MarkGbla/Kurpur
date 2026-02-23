@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="96" fill="#000"/>
+  <!-- K: vertical bar + diagonals, centered -->
+  <path d="M160 120v272h48V264l92 128h56L276 256 356 120h-56l-72 116V120h-48z" fill="#fff"/>
+</svg>

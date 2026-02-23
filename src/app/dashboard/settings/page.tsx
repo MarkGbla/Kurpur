@@ -220,7 +220,7 @@ export default function SettingsPage() {
             {saving ? "Saving..." : "Save budget"}
           </Button>
           <p className="mt-1.5 text-xs text-muted">
-            Used to see if you're on track and to calculate your financial score.
+            Used to see if you&apos;re on track and to calculate your financial score.
           </p>
         </div>
       </div>

@@ -2,13 +2,15 @@
 
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 
 interface SpendingOverviewProps {
   income: number;
   expense: number;
   burnRate: number;
   isLoading?: boolean;
+  /** When a category exceeds this % of total expense, show a warning. */
+  categoryTotals?: Record<string, number>;
 }
 
 export function SpendingOverview({
@@ -16,7 +18,13 @@ export function SpendingOverview({
   expense,
   burnRate,
   isLoading,
+  categoryTotals = {},
 }: SpendingOverviewProps) {
+  const totalExpense = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
+  const over70 = totalExpense > 0
+    ? Object.entries(categoryTotals).find(([, amt]) => (amt / totalExpense) * 100 > 70)
+    : null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -56,6 +64,15 @@ export function SpendingOverview({
         <p className="mt-2 text-xs text-muted">
           Daily burn rate: Le {formatCurrency(burnRate)}/day
         </p>
+      )}
+      {!isLoading && over70 && (
+        <div className="mt-2 flex items-center gap-2 rounded-lg bg-warning/15 px-2.5 py-2 text-xs text-warning">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span>
+            <span className="font-medium capitalize">{over70[0].replace(/_/g, " ")}</span> is{" "}
+            {((over70[1] / totalExpense) * 100).toFixed(0)}% of spending
+          </span>
+        </div>
       )}
     </motion.div>
   );

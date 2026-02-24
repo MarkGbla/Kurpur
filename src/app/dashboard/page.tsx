@@ -2,11 +2,15 @@
 
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { WalletCard } from "@/components/dashboard/WalletCard";
 import { SpendingOverview } from "@/components/dashboard/SpendingOverview";
 import { SavingsMeter } from "@/components/dashboard/SavingsMeter";
 import { EngagementBanner } from "@/components/dashboard/EngagementBanner";
 import { AddTransactionSheet } from "@/components/dashboard/AddTransactionSheet";
+import { AddTransactionFAB } from "@/components/dashboard/AddTransactionFAB";
+import { SaveNowSheet } from "@/components/dashboard/SaveNowSheet";
+import { LevelAndBadges } from "@/components/dashboard/LevelAndBadges";
 import {
   calculateBalance,
   calculateBurnRate,
@@ -29,6 +33,11 @@ export default function DashboardPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [saveSheetOpen, setSaveSheetOpen] = useState(false);
+  const [addSheetInitialType, setAddSheetInitialType] = useState<"income" | "expense">("expense");
+  const [saveSheetInitialAmount, setSaveSheetInitialAmount] = useState(0);
+  const [editTransactionId, setEditTransactionId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   const fetchData = useCallback(async () => {
     if (!user?.id) return;
@@ -72,14 +81,45 @@ export default function DashboardPage() {
     }
   }, [authenticated, user?.id, fetchData]);
 
+  useEffect(() => {
+    const editId = searchParams.get("edit");
+    if (editId) {
+      setEditTransactionId(editId);
+      setSheetOpen(true);
+    }
+  }, [searchParams]);
+
   const handleTransactionAdded = useCallback(() => {
     setSheetOpen(false);
+    fetchData();
+  }, [fetchData]);
+
+  const openAddExpense = useCallback(() => {
+    setAddSheetInitialType("expense");
+    setSheetOpen(true);
+  }, []);
+  const openAddIncome = useCallback(() => {
+    setAddSheetInitialType("income");
+    setSheetOpen(true);
+  }, []);
+  const openSaveNow = useCallback((prefillAmount?: number) => {
+    setSaveSheetInitialAmount(prefillAmount ?? 0);
+    setSaveSheetOpen(true);
+  }, []);
+  const handleSaveSuccess = useCallback(() => {
+    setSaveSheetOpen(false);
     fetchData();
   }, [fetchData]);
 
   const { total, income, expense } = calculateBalance(transactions);
   const burnRate = calculateBurnRate(transactions, 7);
   const suggestedSavings = allocateSavings(income, expense);
+  const categoryTotals = transactions
+    .filter((t) => t.type === "expense")
+    .reduce<Record<string, number>>((acc, t) => {
+      acc[t.category] = (acc[t.category] ?? 0) + Number(t.amount);
+      return acc;
+    }, {});
   const financialScore = computeFinancialScore(
     burnRate,
     userData?.baselineCost ?? 0,
@@ -114,17 +154,24 @@ export default function DashboardPage() {
           expense={expense}
           burnRate={burnRate}
           isLoading={isLoading}
+          categoryTotals={categoryTotals}
         />
         <SavingsMeter
           virtualBalance={userData?.savingsBalance ?? 0}
           target={userData?.savingsTarget ?? 1000}
           isLoading={isLoading}
+          dailySavingsRate={suggestedSavings > 0 ? suggestedSavings : 0}
+          onSaveNow={() => openSaveNow()}
         />
 
         {!isLoading && suggestedSavings > 0 && (
-          <p className="text-center text-sm text-success">
-            You could save Le {suggestedSavings} today
-          </p>
+          <button
+            type="button"
+            onClick={() => openSaveNow(suggestedSavings)}
+            className="w-full rounded-xl bg-success/10 py-3 text-center text-sm font-medium text-success transition-colors hover:bg-success/20 active:bg-success/25"
+          >
+            You could save Le {suggestedSavings} today — tap to pre-fill
+          </button>
         )}
 
         {!isLoading && (
@@ -135,14 +182,38 @@ export default function DashboardPage() {
             financialScore={financialScore}
           />
         )}
+        {!isLoading && (
+          <LevelAndBadges
+            financialScore={financialScore}
+            transactions={transactions}
+            savingsGoalReached={(userData?.savingsBalance ?? 0) >= (userData?.savingsTarget ?? 1000)}
+          />
+        )}
       </section>
 
 
       <AddTransactionSheet
         open={sheetOpen}
-        onOpenChange={setSheetOpen}
+        onOpenChange={(open) => {
+          setSheetOpen(open);
+          if (!open) setEditTransactionId(null);
+        }}
         privyUserId={user?.id ?? ""}
         onSuccess={handleTransactionAdded}
+        initialType={addSheetInitialType}
+        editTransactionId={editTransactionId}
+      />
+      <SaveNowSheet
+        open={saveSheetOpen}
+        onOpenChange={setSaveSheetOpen}
+        privyUserId={user?.id ?? ""}
+        initialAmount={saveSheetInitialAmount}
+        onSuccess={handleSaveSuccess}
+      />
+      <AddTransactionFAB
+        onAddExpense={openAddExpense}
+        onAddIncome={openAddIncome}
+        onAddSavings={() => openSaveNow()}
       />
     </div>
   );

@@ -2,14 +2,69 @@
 
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import {
   calculateBalance,
   calculateBurnRate,
-  computeFinancialScore,
+  computeFinancialScoreBreakdown,
+  getProjectedEndOfMonthBalance,
+  getWeekOverWeekSpending,
+  getDailyExpenseTrend,
 } from "@/lib/finance-engine";
 import type { Transaction } from "@/types/database";
+
+function ScoreHowCalculated({
+  breakdown,
+}: {
+  breakdown: { factors: { label: string; impact: number; description: string }[] };
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-3 border-t border-muted/20 pt-3">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between text-left text-sm text-muted hover:text-accent"
+      >
+        How is this calculated?
+        {open ? (
+          <ChevronUp className="h-4 w-4" />
+        ) : (
+          <ChevronDown className="h-4 w-4" />
+        )}
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <ul className="mt-2 space-y-1.5 text-xs text-muted">
+              {breakdown.factors.map((f) => (
+                <li key={f.label} className="flex justify-between gap-2">
+                  <span>{f.label}:</span>
+                  <span className="text-right">
+                    {f.description}
+                    {f.impact !== 0 && (
+                      <span className={f.impact > 0 ? "text-success" : "text-warning"}>
+                        {" "}
+                        ({f.impact > 0 ? "+" : ""}{f.impact})
+                      </span>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function InsightsPage() {
   const { user, getAccessToken } = usePrivy();
@@ -54,18 +109,19 @@ export default function InsightsPage() {
 
   const { income, expense } = calculateBalance(transactions);
   const burnRate = calculateBurnRate(transactions, 7);
-  const score = computeFinancialScore(
+  const recentCount = transactions.filter((t) => {
+    const d = new Date(t.timestamp);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return d >= weekAgo;
+  }).length;
+  const scoreBreakdown = computeFinancialScoreBreakdown(
     burnRate,
     userInfo?.baseline_cost ?? 0,
     savings.virtualBalance,
-    transactions.filter((t) => {
-      const d = new Date(t.timestamp);
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return d >= weekAgo;
-    }).length
+    recentCount
   );
-
+  const score = scoreBreakdown.score;
   const categoryTotals = transactions.reduce<Record<string, number>>(
     (acc, t) => {
       if (t.type === "expense") {
@@ -76,7 +132,14 @@ export default function InsightsPage() {
     {}
   );
   const totalExpense = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
-
+  const { total: balance } = calculateBalance(transactions);
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const daysRemaining = Math.max(0, lastDay.getDate() - now.getDate());
+  const projectedEOM = getProjectedEndOfMonthBalance(balance, burnRate, daysRemaining);
+  const { thisWeek, lastWeek } = getWeekOverWeekSpending(transactions);
+  const dailyTrend7 = getDailyExpenseTrend(transactions, 7);
+  const maxDaily = Math.max(1, ...dailyTrend7.map((d) => d.amount));
   const scoreLabel =
     score >= 80
       ? "Excellent"
@@ -95,6 +158,18 @@ export default function InsightsPage() {
       </div>
     );
   }
+
+  const [shareCopied, setShareCopied] = useState(false);
+  const monthName = now.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+  const shareSummary = `Kurpur · ${monthName}\nIncome: Le ${formatCurrency(income)}\nExpense: Le ${formatCurrency(expense)}\nScore: ${score}/100`;
+
+  const handleCopySummary = async () => {
+    try {
+      await navigator.clipboard.writeText(shareSummary);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch {}
+  };
 
   return (
     <div className="min-h-screen bg-background px-4 pb-6 pt-6">
@@ -126,6 +201,12 @@ export default function InsightsPage() {
           <p className="mt-2 text-xs text-muted">
             Compares your spending to your budget; higher = more on track.
           </p>
+          <ScoreHowCalculated breakdown={scoreBreakdown} />
+          {scoreBreakdown.recommendation && (
+            <p className="mt-3 rounded-lg bg-accent/10 px-3 py-2 text-sm text-accent">
+              {scoreBreakdown.recommendation}
+            </p>
+          )}
         </motion.div>
 
         <motion.div
@@ -139,6 +220,65 @@ export default function InsightsPage() {
             Le {formatCurrency(burnRate)} / day
           </p>
           <p className="mt-1 text-xs text-muted">Average daily spending</p>
+          {dailyTrend7.length > 0 && (
+            <div className="mt-3 flex items-end gap-1">
+              {dailyTrend7.map((d) => (
+                <div
+                  key={d.date}
+                  className="flex-1 rounded-t bg-warning/30"
+                  style={{
+                    height: `${Math.max(4, (d.amount / maxDaily) * 48)}px`,
+                  }}
+                  title={`${d.date}: Le ${formatCurrency(d.amount)}`}
+                />
+              ))}
+            </div>
+          )}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.06 }}
+          className="rounded-2xl bg-surface-card p-6"
+        >
+          <p className="text-sm text-muted">Week over week</p>
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-xs text-muted">This week</p>
+              <p className="font-semibold text-warning">
+                Le {formatCurrency(thisWeek)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted">Last week</p>
+              <p className="font-semibold text-muted">
+                Le {formatCurrency(lastWeek)}
+              </p>
+            </div>
+          </div>
+          {lastWeek > 0 && (
+            <p className="mt-2 text-xs text-muted">
+              {thisWeek <= lastWeek
+                ? `Down ${formatCurrency(lastWeek - thisWeek)} vs last week`
+                : `Up ${formatCurrency(thisWeek - lastWeek)} vs last week`}
+            </p>
+          )}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.07 }}
+          className="rounded-2xl bg-surface-card p-6"
+        >
+          <p className="text-sm text-muted">Projected end of month</p>
+          <p className={`mt-1 text-2xl font-bold ${projectedEOM >= 0 ? "text-success" : "text-warning"}`}>
+            Le {formatCurrency(projectedEOM)}
+          </p>
+          <p className="mt-1 text-xs text-muted">
+            At current burn rate (Le {formatCurrency(burnRate)}/day), {daysRemaining} days left
+          </p>
         </motion.div>
 
         <motion.div
@@ -202,6 +342,26 @@ export default function InsightsPage() {
               </p>
             </div>
           </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="rounded-2xl bg-surface-card p-6"
+        >
+          <p className="text-sm text-muted">Monthly summary</p>
+          <p className="mt-1 text-xs text-muted">{monthName}</p>
+          <pre className="mt-2 whitespace-pre-wrap rounded-lg bg-background/50 p-3 text-xs text-muted">
+            {shareSummary}
+          </pre>
+          <button
+            type="button"
+            onClick={handleCopySummary}
+            className="mt-3 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-background hover:bg-accent/90"
+          >
+            {shareCopied ? "Copied!" : "Copy summary"}
+          </button>
         </motion.div>
       </div>
     </div>

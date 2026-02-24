@@ -2,6 +2,7 @@
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
 
@@ -18,23 +19,25 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <PrivyProvider
-      appId={privyAppId}
-      config={{
-        loginMethods: ["email", "wallet"],
-        appearance: {
-          theme: "dark",
-          accentColor: "#FFFFFF",
-        },
-        embeddedWallets: {
-          solana: {
-            createOnLogin: "users-without-wallets",
+    <ThemeProvider>
+      <PrivyProvider
+        appId={privyAppId}
+        config={{
+          loginMethods: ["email", "wallet"],
+          appearance: {
+            theme: "dark",
+            accentColor: "#FFFFFF",
           },
-        },
-      }}
-    >
-      {children}
-      <InstallPrompt />
-    </PrivyProvider>
+          embeddedWallets: {
+            solana: {
+              createOnLogin: "users-without-wallets",
+            },
+          },
+        }}
+      >
+        {children}
+        <InstallPrompt />
+      </PrivyProvider>
+    </ThemeProvider>
   );
 }

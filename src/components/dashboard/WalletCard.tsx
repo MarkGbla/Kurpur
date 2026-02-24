@@ -9,6 +9,7 @@ interface WalletCardProps {
   isLoading?: boolean;
   /** Optional: last 4 digits for card display (e.g. from user id). */
   accountLast4?: string;
+  /** Optional: show small add button on card (primary action is now FAB). */
   onAddClick?: () => void;
 }
 
@@ -28,7 +29,7 @@ export function WalletCard({
       transition={{ duration: 0.2, ease: "easeOut" }}
       className="relative overflow-hidden rounded-2xl bg-[#1a1a1a] p-6 shadow-lg"
     >
-      {/* Top row: Wallet title + Add button */}
+      {/* Top row: Wallet title (primary add action is FAB) */}
       <div className="relative flex items-center justify-between">
         <h2 className="text-base font-medium text-white">Wallet</h2>
         {onAddClick && (
@@ -36,7 +37,7 @@ export function WalletCard({
             type="button"
             onClick={onAddClick}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2a2a2a] text-white transition-opacity hover:opacity-90 active:opacity-80"
-            aria-label="Add transaction"
+            aria-label="Quick add transaction"
           >
             <Plus className="h-5 w-5" strokeWidth={2} />
           </button>

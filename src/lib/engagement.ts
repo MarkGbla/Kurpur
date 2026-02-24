@@ -81,3 +81,28 @@ export function calculateUsageStreak(
   }
   return streak;
 }
+
+/** Level 1–10 from financial score. */
+export function getLevelFromScore(score: number): number {
+  if (score <= 0) return 1;
+  return Math.min(10, Math.floor(score / 10) + 1);
+}
+
+/** Check if user has had a no-spend day in the last 7 days. */
+export function hasNoSpendDayRecently(
+  transactionDatesByType: { date: string; type: string }[]
+): boolean {
+  const expenseDates = new Set(
+    transactionDatesByType
+      .filter((t) => t.type === "expense")
+      .map((t) => t.date)
+  );
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = d.toDateString();
+    if (!expenseDates.has(key)) return true;
+  }
+  return false;
+}

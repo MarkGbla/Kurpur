@@ -28,7 +28,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('kurpur_theme');document.documentElement.className=t==='light'?'light':'dark';})();`,
+          }}
+        />
+      </head>
       <body className={`${inter.variable} font-sans min-h-screen`}>
         <Providers>{children}</Providers>
       </body>

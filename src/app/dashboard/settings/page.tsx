@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { LogOut, MessageCircle, Bell } from "lucide-react";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useTheme } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { SUGGESTED_BUDGET_PERCENT, BUDGET_PERCENT_OPTIONS } from "@/constants/budget";
@@ -40,6 +41,7 @@ export default function SettingsPage() {
   const [feedbackError, setFeedbackError] = useState<string | null>(null);
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
 
+  const { theme, setTheme } = useTheme();
   const {
     status: pushStatus,
     message: pushMessage,
@@ -171,6 +173,35 @@ export default function SettingsPage() {
           <p className="font-medium text-muted">
             {user?.wallet ? "Connected" : "Not connected"}
           </p>
+        </div>
+        <div>
+          <p className="text-xs text-muted">Theme</p>
+          <div className="mt-1 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setTheme("dark")}
+              className={cn(
+                "rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                theme === "dark"
+                  ? "bg-accent text-background"
+                  : "bg-surface text-muted hover:bg-surface-card"
+              )}
+            >
+              Dark
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme("light")}
+              className={cn(
+                "rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                theme === "light"
+                  ? "bg-accent text-background"
+                  : "bg-surface text-muted hover:bg-surface-card"
+              )}
+            >
+              Light
+            </button>
+          </div>
         </div>
         <div>
           <label htmlFor="baseline" className="text-xs text-muted">

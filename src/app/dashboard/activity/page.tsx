@@ -80,7 +80,7 @@ export default function ActivityPage() {
       if (!cancelled) setIsLoading(false);
     });
     return () => { cancelled = true; };
-  }, [user?.id, fetchTransactions]);
+  }, [user?.id, fetchTransactions]); // eslint-disable-line react-hooks/exhaustive-deps -- fetchTransactions is stable
 
   const filtered = useMemo(() => {
     const byRange = filterByRange(transactions, filter);

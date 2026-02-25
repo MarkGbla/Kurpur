@@ -22,7 +22,7 @@ export function SaveNowSheet({
   onSuccess,
 }: SaveNowSheetProps) {
   const { getAccessToken } = usePrivy();
-  const [amount, setAmount] = React.useState(string(initialAmount || 0));
+  const [amount, setAmount] = React.useState(String(initialAmount || 0));
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 

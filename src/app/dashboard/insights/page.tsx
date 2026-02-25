@@ -72,7 +72,8 @@ export default function InsightsPage() {
   const [savings, setSavings] = useState({ virtualBalance: 0, batchThreshold: 1000 });
   const [userInfo, setUserInfo] = useState<{ baseline_cost: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [shareCopied, setShareCopied] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false); // Must be before any conditional return (rules-of-hooks)
+
 
   useEffect(() => {
     if (!user?.id) return;

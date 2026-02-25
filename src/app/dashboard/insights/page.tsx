@@ -72,6 +72,7 @@ export default function InsightsPage() {
   const [savings, setSavings] = useState({ virtualBalance: 0, batchThreshold: 1000 });
   const [userInfo, setUserInfo] = useState<{ baseline_cost: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -151,15 +152,6 @@ export default function InsightsPage() {
             ? "Needs work"
             : "At risk";
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-pulse rounded-full bg-surface-card" />
-      </div>
-    );
-  }
-
-  const [shareCopied, setShareCopied] = useState(false);
   const monthName = now.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
   const shareSummary = `Kurpur · ${monthName}\nIncome: Le ${formatCurrency(income)}\nExpense: Le ${formatCurrency(expense)}\nScore: ${score}/100`;
 
@@ -170,6 +162,14 @@ export default function InsightsPage() {
       setTimeout(() => setShareCopied(false), 2000);
     } catch {}
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-surface-card" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background px-4 pb-6 pt-6">

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePrivy } from "@privy-io/react-auth";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Search, MoreVertical, Pencil, Trash2 } from "lucide-react";
@@ -63,7 +63,7 @@ export default function ActivityPage() {
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     if (!user?.id) return;
     const token = await getAccessToken?.().catch(() => null);
     const headers: HeadersInit = {};
@@ -71,7 +71,7 @@ export default function ActivityPage() {
     const r = await fetch(`/api/transactions?userId=${user.id}`, { headers });
     const d = await r.json();
     setTransactions(d.transactions ?? []);
-  };
+  }, [user?.id, getAccessToken]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -80,7 +80,7 @@ export default function ActivityPage() {
       if (!cancelled) setIsLoading(false);
     });
     return () => { cancelled = true; };
-  }, [user?.id, getAccessToken]);
+  }, [user?.id, fetchTransactions]);
 
   const filtered = useMemo(() => {
     const byRange = filterByRange(transactions, filter);

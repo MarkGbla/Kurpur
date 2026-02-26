@@ -72,7 +72,7 @@ export default function InsightsPage() {
   const [savings, setSavings] = useState({ virtualBalance: 0, batchThreshold: 1000 });
   const [userInfo, setUserInfo] = useState<{ baseline_cost: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [shareCopied, setShareCopied] = useState(false); // Must be before any conditional return (rules-of-hooks)
+  const [shareCopied, setShareCopied] = useState(false);
 
 
   useEffect(() => {
@@ -164,15 +164,11 @@ export default function InsightsPage() {
     } catch {}
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-pulse rounded-full bg-surface-card" />
-      </div>
-    );
-  }
-
-  return (
+  return isLoading ? (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="h-8 w-8 animate-pulse rounded-full bg-surface-card" />
+    </div>
+  ) : (
     <div className="min-h-screen bg-background px-4 pb-6 pt-6">
       <h1 className="text-2xl font-bold tracking-tight">Insights</h1>
       <p className="mt-0.5 text-sm text-muted">Your financial overview</p>

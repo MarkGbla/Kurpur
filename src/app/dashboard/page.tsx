@@ -146,7 +146,7 @@ export default function DashboardPage() {
         <WalletCard
           balance={total}
           isLoading={isLoading}
-          accountLast4={userData?.id?.slice(-4) ?? "****"}
+          userEmail={user?.email?.address ?? null}
           onAddClick={() => setSheetOpen(true)}
         />
         <SpendingOverview

@@ -73,6 +73,7 @@ export default function ActivityPage() {
     setTransactions(d.transactions ?? []);
   }, [user?.id, getAccessToken]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchTransactions is stable via useCallback
   useEffect(() => {
     if (!user?.id) return;
     let cancelled = false;
@@ -80,7 +81,7 @@ export default function ActivityPage() {
       if (!cancelled) setIsLoading(false);
     });
     return () => { cancelled = true; };
-  }, [user?.id, fetchTransactions]); // eslint-disable-line react-hooks/exhaustive-deps -- fetchTransactions is stable
+  }, [user?.id, fetchTransactions]);
 
   const filtered = useMemo(() => {
     const byRange = filterByRange(transactions, filter);

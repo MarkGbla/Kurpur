@@ -10,13 +10,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#000000",
-        surface: "#111111",
-        "surface-card": "#1A1A1A",
-        accent: "#FFFFFF",
-        muted: "#8A8A8A",
-        success: "#22C55E",
-        warning: "#F59E0B",
+        background: "var(--background)",
+        surface: "var(--surface)",
+        "surface-card": "var(--surface-card)",
+        accent: "var(--accent)",
+        foreground: "var(--foreground)",
+        muted: "var(--muted)",
+        "muted-foreground": "var(--muted-foreground)",
+        success: "var(--success)",
+        warning: "var(--warning)",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],

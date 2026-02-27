@@ -326,9 +326,14 @@ export default function SettingsPage() {
                 min="0"
                 step="100"
                 value={baselineCost}
-                onChange={(e) => setBaselineCost(e.target.value)}
+                onChange={(e) => {
+                  setBaselineCost(e.target.value);
+                  setSaveError(null);
+                }}
                 className="min-w-0 flex-1 rounded-xl border border-muted/30 bg-background px-4 py-2.5 text-foreground outline-none transition-shadow focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
                 placeholder="e.g. 500000"
+                aria-invalid={!!saveError}
+                aria-describedby={saveError ? "baseline-error" : saveSuccess ? "baseline-success" : undefined}
               />
               {suggestedBudget > 0 && (
                 <Button
@@ -344,10 +349,14 @@ export default function SettingsPage() {
             </div>
             <div className="pt-1">
               {saveError && (
-                <p className="mb-2 text-sm text-warning">{saveError}</p>
+                <p id="baseline-error" className="mb-2 text-sm text-warning" role="alert">
+                  {saveError}
+                </p>
               )}
               {saveSuccess && (
-                <p className="mb-2 text-sm text-success">Budget saved. It will be used on Dashboard and Insights.</p>
+                <p id="baseline-success" className="mb-2 text-sm text-success" role="status">
+                  Budget saved. It will be used on Dashboard and Insights.
+                </p>
               )}
               <Button
                 onClick={handleSaveBaseline}

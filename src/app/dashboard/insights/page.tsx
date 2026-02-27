@@ -2,8 +2,9 @@
 
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import {
   calculateBalance,
@@ -202,6 +203,24 @@ export default function InsightsPage() {
           <p className="mt-2 text-xs text-muted">
             Compares your spending to your budget; higher = more on track.
           </p>
+          {(userInfo?.baseline_cost ?? 0) > 0 ? (
+            <p className="mt-2 text-xs text-muted">
+              Monthly budget: Le {formatCurrency(userInfo.baseline_cost)}
+            </p>
+          ) : (
+            <p className="mt-2 text-xs text-muted">
+              Set your budget in Profile for a more accurate score.
+            </p>
+          )}
+          {(userInfo?.baseline_cost ?? 0) === 0 && (
+            <Link
+              href="/dashboard/settings"
+              className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-accent hover:underline"
+            >
+              Set budget in Profile
+              <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
+            </Link>
+          )}
           <ScoreHowCalculated breakdown={scoreBreakdown} />
           {scoreBreakdown.recommendation && (
             <p className="mt-3 rounded-lg bg-accent/10 px-3 py-2 text-sm text-accent">

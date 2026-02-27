@@ -27,7 +27,7 @@ export function WalletCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-[1.25rem] bg-[#0d0d0d] shadow-xl"
+      className="relative overflow-hidden rounded-[1.25rem] bg-surface-card shadow-xl"
     >
       {/* Decorative curved lines (Kurpur brand pattern) */}
       <div className="absolute inset-0 overflow-hidden rounded-[1.25rem]" aria-hidden>
@@ -59,7 +59,7 @@ export function WalletCard({
         {/* Top row: Kurpur logo + optional add */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/40">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/20">
               <Image
                 src="/logo.svg"
                 alt=""
@@ -69,13 +69,13 @@ export function WalletCard({
                 aria-hidden
               />
             </div>
-            <span className="text-sm font-medium tracking-wide text-white/95">Kurpur</span>
+            <span className="text-sm font-medium tracking-wide text-foreground">Kurpur</span>
           </div>
           {onAddClick && (
             <button
               type="button"
               onClick={onAddClick}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-opacity hover:bg-white/20 active:opacity-80"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/10 text-foreground transition-opacity hover:bg-accent/20 active:opacity-80"
               aria-label="Quick add transaction"
             >
               <Plus className="h-5 w-5" strokeWidth={2} />
@@ -91,12 +91,12 @@ export function WalletCard({
           >
             <div className="grid grid-cols-4 grid-rows-3 gap-0.5">
               {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="h-1.5 w-2 rounded-sm bg-[#3a3a3a]" />
+                <div key={i} className="h-1.5 w-2 rounded-sm bg-muted" />
               ))}
             </div>
           </div>
           <svg
-            className="h-7 w-7 text-white/70"
+            className="h-7 w-7 text-muted"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -113,15 +113,15 @@ export function WalletCard({
 
         {/* Balance */}
         {isLoading ? (
-          <div className="mt-5 h-11 w-44 animate-pulse rounded-lg bg-white/10" />
+          <div className="mt-5 h-11 w-44 animate-pulse rounded-lg bg-accent/10" />
         ) : (
-          <p className="mt-5 text-2xl font-bold tracking-tight text-white md:text-3xl">
+          <p className="mt-5 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
             Le {formatCurrencyWithDecimals(balance)}
           </p>
         )}
 
         {/* Cardholder name (from email) */}
-        <p className="mt-4 text-sm font-medium tracking-[0.2em] text-white/80">
+        <p className="mt-4 text-sm font-medium tracking-[0.2em] text-muted-foreground">
           {cardholderName}
         </p>
       </div>

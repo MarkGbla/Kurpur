@@ -4,6 +4,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { WalletCard } from "@/components/dashboard/WalletCard";
+import { BudgetCard } from "@/components/dashboard/BudgetCard";
 import { SpendingOverview } from "@/components/dashboard/SpendingOverview";
 import { SavingsMeter } from "@/components/dashboard/SavingsMeter";
 import { EngagementBanner } from "@/components/dashboard/EngagementBanner";
@@ -148,6 +149,11 @@ export default function DashboardPage() {
           isLoading={isLoading}
           userEmail={user?.email?.address ?? null}
           onAddClick={() => setSheetOpen(true)}
+        />
+        <BudgetCard
+          baselineCost={userData?.baselineCost ?? 0}
+          burnRate={burnRate}
+          isLoading={isLoading}
         />
         <SpendingOverview
           income={income}

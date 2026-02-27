@@ -26,11 +26,11 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = React.useState<Theme>("dark");
-  const [mounted, setMounted] = React.useState(false);
+  const [theme, setThemeState] = React.useState<Theme>(() =>
+    typeof window === "undefined" ? "dark" : getStoredTheme()
+  );
 
   React.useEffect(() => {
-    setMounted(true);
     // Sync with document (set by layout script) so UI matches actual theme
     const docClass = document.documentElement.className;
     const t: Theme = docClass === "light" ? "light" : "dark";
@@ -46,8 +46,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setStoredTheme(t);
     document.documentElement.className = t;
   }, []);
-
-  if (!mounted) return <>{children}</>;
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>

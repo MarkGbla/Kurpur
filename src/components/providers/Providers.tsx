@@ -2,9 +2,34 @@
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import { InstallPrompt } from "@/components/InstallPrompt";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { ThemeProvider, useTheme } from "@/components/providers/ThemeProvider";
 
 const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+
+function PrivyWithTheme({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+  if (!privyAppId || privyAppId === "placeholder") return null;
+  return (
+    <PrivyProvider
+      appId={privyAppId}
+      config={{
+        loginMethods: ["email", "wallet"],
+        appearance: {
+          theme: theme as "light" | "dark",
+          accentColor: theme === "dark" ? "#FFFFFF" : "#171717",
+        },
+        embeddedWallets: {
+          solana: {
+            createOnLogin: "users-without-wallets",
+          },
+        },
+      }}
+    >
+      {children}
+      <InstallPrompt />
+    </PrivyProvider>
+  );
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   if (!privyAppId || privyAppId === "placeholder") {
@@ -20,24 +45,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider>
-      <PrivyProvider
-        appId={privyAppId}
-        config={{
-          loginMethods: ["email", "wallet"],
-          appearance: {
-            theme: "dark",
-            accentColor: "#FFFFFF",
-          },
-          embeddedWallets: {
-            solana: {
-              createOnLogin: "users-without-wallets",
-            },
-          },
-        }}
-      >
-        {children}
-        <InstallPrompt />
-      </PrivyProvider>
+      <PrivyWithTheme>{children}</PrivyWithTheme>
     </ThemeProvider>
   );
 }

@@ -101,3 +101,53 @@ export async function addToSavings(
     virtualBalance: row ? Number(row.virtual_balance) : 0,
   };
 }
+
+/**
+ * Permanently delete the user and all related data (transactions, savings_ledger,
+ * push_subscriptions via CASCADE). Caller may also delete the user from Privy.
+ */
+export async function deleteAccount(
+  privyUserId: string
+): Promise<{ ok: boolean; error?: string }> {
+  const sql = getNeonDb();
+  const userRows = (await sql`
+    SELECT id FROM users WHERE privy_user_id = ${privyUserId} LIMIT 1
+  `) as { id: string }[];
+  if (userRows.length === 0) return { ok: true };
+
+  await sql`DELETE FROM users WHERE privy_user_id = ${privyUserId}`;
+  return { ok: true };
+}
+
+/**
+ * Restart account: clear all transactions, reset savings ledger and user defaults.
+ * Keeps the same account (Privy identity); user starts with a clean slate.
+ */
+export async function restartAccount(
+  privyUserId: string
+): Promise<{ ok: boolean; error?: string }> {
+  const sql = getNeonDb();
+  const userRows = (await sql`
+    SELECT id FROM users WHERE privy_user_id = ${privyUserId} LIMIT 1
+  `) as { id: string }[];
+  const user = userRows[0];
+  if (!user) return { ok: false, error: "User not found" };
+
+  await sql`DELETE FROM transactions WHERE user_id = ${user.id}`;
+  await sql`
+    UPDATE savings_ledger
+    SET virtual_balance = 0, batch_threshold = 1000, transfer_status = 'pending'
+    WHERE user_id = ${user.id}
+  `;
+  await sql`
+    UPDATE users
+    SET baseline_cost = 0, financial_score = 0
+    WHERE id = ${user.id}
+  `;
+  try {
+    await sql`DELETE FROM push_subscriptions WHERE user_id = ${user.id}`;
+  } catch {
+    // Table may not exist if push migration was not run
+  }
+  return { ok: true };
+}

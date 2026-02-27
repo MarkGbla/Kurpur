@@ -5,7 +5,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { LogOut, MessageCircle, Bell } from "lucide-react";
+import { LogOut, MessageCircle, Bell, RotateCcw, Trash2 } from "lucide-react";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
@@ -40,6 +40,13 @@ export default function SettingsPage() {
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
   const [feedbackError, setFeedbackError] = useState<string | null>(null);
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
+  const [restartOpen, setRestartOpen] = useState(false);
+  const [restartSubmitting, setRestartSubmitting] = useState(false);
+  const [restartError, setRestartError] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const { theme, setTheme } = useTheme();
   const {
@@ -153,6 +160,72 @@ export default function SettingsPage() {
       setFeedbackError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setFeedbackSubmitting(false);
+    }
+  };
+
+  const handleRestartOpenChange = (open: boolean) => {
+    setRestartOpen(open);
+    if (!open) {
+      setRestartError(null);
+    }
+  };
+
+  const handleRestartConfirm = async () => {
+    if (!user?.id) return;
+    setRestartSubmitting(true);
+    setRestartError(null);
+    try {
+      const token = await getAccessToken?.().catch(() => null);
+      const res = await fetch("/api/user/account", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ action: "restart" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to restart account");
+      setRestartOpen(false);
+      await loadUser();
+    } catch (err) {
+      setRestartError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setRestartSubmitting(false);
+    }
+  };
+
+  const handleDeleteOpenChange = (open: boolean) => {
+    setDeleteOpen(open);
+    if (!open) {
+      setDeleteConfirmText("");
+      setDeleteError(null);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteConfirmText !== "DELETE" || !user?.id) return;
+    setDeleteSubmitting(true);
+    setDeleteError(null);
+    try {
+      const token = await getAccessToken?.().catch(() => null);
+      const res = await fetch("/api/user/account", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ action: "delete" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to delete account");
+      setDeleteOpen(false);
+      logout();
+      router.replace("/");
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setDeleteSubmitting(false);
     }
   };
 
@@ -327,6 +400,24 @@ export default function SettingsPage() {
           <LogOut className="h-5 w-5" strokeWidth={1.5} />
           Sign out
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setRestartOpen(true)}
+          className="w-full gap-2 text-muted hover:bg-surface-card"
+        >
+          <RotateCcw className="h-5 w-5" strokeWidth={1.5} />
+          Restart account
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setDeleteOpen(true)}
+          className="w-full gap-2 text-red-500 hover:bg-red-500/10 hover:text-red-500"
+        >
+          <Trash2 className="h-5 w-5" strokeWidth={1.5} />
+          Delete account
+        </Button>
       </div>
 
       <Dialog.Root open={feedbackOpen} onOpenChange={handleFeedbackOpenChange}>
@@ -395,6 +486,90 @@ export default function SettingsPage() {
             >
               {feedbackSubmitting ? "Sending..." : "Send feedback"}
             </Button>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      <Dialog.Root open={restartOpen} onOpenChange={handleRestartOpenChange}>
+        <Dialog.Portal>
+          <Dialog.Overlay
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            onClick={() => handleRestartOpenChange(false)}
+          />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(calc(100vw-2rem),24rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-muted/20 bg-surface p-4 shadow-xl outline-none">
+            <h2 className="text-lg font-semibold">Restart account</h2>
+            <p className="mt-0.5 text-sm text-muted">
+              Clear all transactions and reset your savings. You keep the same account and can start fresh.
+            </p>
+            {restartError && (
+              <p className="mt-2 text-sm text-warning">{restartError}</p>
+            )}
+            <div className="mt-4 flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleRestartOpenChange(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleRestartConfirm}
+                disabled={restartSubmitting}
+                className="flex-1"
+              >
+                {restartSubmitting ? "Restarting…" : "Restart"}
+              </Button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      <Dialog.Root open={deleteOpen} onOpenChange={handleDeleteOpenChange}>
+        <Dialog.Portal>
+          <Dialog.Overlay
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            onClick={() => handleDeleteOpenChange(false)}
+          />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(calc(100vw-2rem),24rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-muted/20 bg-surface p-4 shadow-xl outline-none">
+            <h2 className="text-lg font-semibold text-red-500">Delete account</h2>
+            <p className="mt-0.5 text-sm text-muted">
+              This permanently deletes your account and all data. You will need to sign up again to use Kurpur.
+            </p>
+            <label htmlFor="delete-confirm" className="mt-4 block text-sm text-muted">
+              Type <strong>DELETE</strong> to confirm
+            </label>
+            <input
+              id="delete-confirm"
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="DELETE"
+              className="mt-1.5 w-full rounded-xl border border-muted/30 bg-background px-4 py-2.5 text-foreground outline-none focus:ring-2 focus:ring-accent"
+            />
+            {deleteError && (
+              <p className="mt-2 text-sm text-warning">{deleteError}</p>
+            )}
+            <div className="mt-4 flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleDeleteOpenChange(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleDeleteConfirm}
+                disabled={deleteSubmitting || deleteConfirmText !== "DELETE"}
+                className="flex-1 border-red-500 text-red-500 hover:bg-red-500/10 hover:text-red-500"
+              >
+                {deleteSubmitting ? "Deleting…" : "Delete forever"}
+              </Button>
+            </div>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>

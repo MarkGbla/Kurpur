@@ -63,7 +63,7 @@ export default function DashboardPage() {
         setUserData({
           id: data.user.id,
           privyUserId: user.id,
-          baselineCost: data.user.baseline_cost ?? 0,
+          baselineCost: Number(data.user.baseline_cost) || 0,
           savingsBalance: data.savings?.virtualBalance ?? 0,
           savingsTarget: data.savings?.batchThreshold ?? 1000,
         });

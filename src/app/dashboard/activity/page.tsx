@@ -80,7 +80,6 @@ export default function ActivityPage() {
       if (!cancelled) setIsLoading(false);
     });
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchTransactions from useCallback; deps intentional
   }, [user?.id, fetchTransactions]);
 
   const filtered = useMemo(() => {

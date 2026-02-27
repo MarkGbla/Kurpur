@@ -32,6 +32,8 @@ export default function SettingsPage() {
   const [baselineCost, setBaselineCost] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [suggestedPercent, setSuggestedPercent] = useState(SUGGESTED_BUDGET_PERCENT);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -84,8 +86,9 @@ export default function SettingsPage() {
       ]);
       const syncData = await syncRes.json();
       const txData = await txRes.json();
-      if (syncData.user != null && typeof syncData.user.baseline_cost === "number") {
-        setBaselineCost(String(syncData.user.baseline_cost));
+      const raw = syncData.user?.baseline_cost;
+      if (raw != null && !isNaN(Number(raw))) {
+        setBaselineCost(String(Number(raw)));
       }
       setTransactions(txData.transactions ?? []);
     } catch {
@@ -98,8 +101,18 @@ export default function SettingsPage() {
   }, [user?.id, loadUser]);
 
   const handleSaveBaseline = async () => {
+    setLoadError(null);
+    setSaveError(null);
+    setSaveSuccess(false);
     const num = parseFloat(baselineCost);
-    if (isNaN(num) || num < 0 || !user?.id) return;
+    if (!user?.id) {
+      setSaveError("Please sign in to save your budget.");
+      return;
+    }
+    if (baselineCost.trim() === "" || isNaN(num) || num < 0) {
+      setSaveError("Enter a valid budget amount (0 or more).");
+      return;
+    }
     setSaving(true);
     try {
       const token = await getAccessToken?.().catch(() => null);
@@ -113,8 +126,10 @@ export default function SettingsPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to save");
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {
-      setLoadError(err instanceof Error ? err.message : "Failed to save");
+      setSaveError(err instanceof Error ? err.message : "Failed to save");
     } finally {
       setSaving(false);
     }
@@ -328,6 +343,12 @@ export default function SettingsPage() {
               )}
             </div>
             <div className="pt-1">
+              {saveError && (
+                <p className="mb-2 text-sm text-warning">{saveError}</p>
+              )}
+              {saveSuccess && (
+                <p className="mb-2 text-sm text-success">Budget saved. It will be used on Dashboard and Insights.</p>
+              )}
               <Button
                 onClick={handleSaveBaseline}
                 disabled={saving}
@@ -337,7 +358,7 @@ export default function SettingsPage() {
                 {saving ? "Saving..." : "Save budget"}
               </Button>
               <p className="mt-3 text-xs text-muted leading-relaxed">
-                Used to see if you&apos;re on track and to calculate your financial score.
+                Your budget is used on the <strong>Dashboard</strong> to show if you&apos;re on track, and in <strong>Insights</strong> to calculate your financial score and recommendations.
               </p>
             </div>
           </div>

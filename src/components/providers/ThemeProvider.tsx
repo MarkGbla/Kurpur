@@ -31,9 +31,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     setMounted(true);
-    const t = getStoredTheme();
+    // Sync with document (set by layout script) so UI matches actual theme
+    const docClass = document.documentElement.className;
+    const t: Theme = docClass === "light" ? "light" : "dark";
     setThemeState(t);
-    document.documentElement.className = t;
+    setStoredTheme(t);
+    if (document.documentElement.className !== t) {
+      document.documentElement.className = t;
+    }
   }, []);
 
   const setTheme = React.useCallback((t: Theme) => {

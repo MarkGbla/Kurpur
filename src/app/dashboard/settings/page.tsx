@@ -234,106 +234,113 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
       <p className="mt-0.5 text-sm text-muted">Account settings</p>
 
-      <div className="mt-6 space-y-4 rounded-2xl bg-surface-card p-4">
+      <div className="mt-6 space-y-5 rounded-2xl bg-surface-card p-4 sm:p-5">
         <div>
-          <p className="text-xs text-muted">Email</p>
-          <p className="font-medium">
+          <p className="text-xs font-medium text-muted">Email</p>
+          <p className="mt-0.5 font-medium text-foreground">
             {user?.email?.address ?? "Not set"}
           </p>
         </div>
         <div>
-          <p className="text-xs text-muted">Wallet</p>
-          <p className="font-medium text-muted">
+          <p className="text-xs font-medium text-muted">Wallet</p>
+          <p className="mt-0.5 font-medium text-muted">
             {user?.wallet ? "Connected" : "Not connected"}
           </p>
         </div>
         <div>
-          <p className="text-xs text-muted">Theme</p>
-          <div className="mt-1 flex gap-2">
+          <p className="text-xs font-medium text-muted">Theme</p>
+          <div className="mt-1.5 flex gap-2">
             <button
               type="button"
+              aria-pressed={theme === "dark"}
               onClick={() => setTheme("dark")}
               className={cn(
-                "rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                "flex-1 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background",
                 theme === "dark"
                   ? "bg-accent text-background"
-                  : "bg-surface text-muted hover:bg-surface-card"
+                  : "bg-surface text-muted hover:bg-surface-card hover:text-foreground"
               )}
             >
               Dark
             </button>
             <button
               type="button"
+              aria-pressed={theme === "light"}
               onClick={() => setTheme("light")}
               className={cn(
-                "rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                "flex-1 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background",
                 theme === "light"
                   ? "bg-accent text-background"
-                  : "bg-surface text-muted hover:bg-surface-card"
+                  : "bg-surface text-muted hover:bg-surface-card hover:text-foreground"
               )}
             >
               Light
             </button>
           </div>
         </div>
-        <div>
-          <label htmlFor="baseline" className="text-xs text-muted">
-            Monthly budget (Le)
-          </label>
-          {income > 0 && (
-            <>
-              <p className="mt-1 text-xs text-muted">
-                Your income this month: Le {formatCurrency(income)}. Suggested budget ({suggestedPercent}%): Le {formatCurrency(suggestedBudget)}.
-              </p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {BUDGET_PERCENT_OPTIONS.map((p) => (
-                  <Button
-                    key={p}
-                    type="button"
-                    variant={suggestedPercent === p ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => applySuggested(p)}
-                  >
-                    {p}%
-                  </Button>
-                ))}
-              </div>
-            </>
-          )}
-          <div className="mt-2 flex gap-2">
-            <input
-              id="baseline"
-              type="number"
-              min="0"
-              step="100"
-              value={baselineCost}
-              onChange={(e) => setBaselineCost(e.target.value)}
-              className="flex-1 rounded-xl border border-muted/30 bg-background px-4 py-2.5 text-foreground outline-none focus:ring-2 focus:ring-accent"
-              placeholder="e.g. 500000"
-            />
-            {suggestedBudget > 0 && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setBaselineCost(String(suggestedBudget))}
-                className="shrink-0"
-              >
-                Use suggested
-              </Button>
+        <div className="border-t border-muted/20 pt-5">
+          <div className="space-y-4">
+            <label htmlFor="baseline" className="block text-xs font-medium text-muted">
+              Monthly budget (Le)
+            </label>
+            {income > 0 && (
+              <>
+                <p className="text-xs text-muted leading-relaxed">
+                  Your income this month: Le {formatCurrency(income)}. Suggested budget ({suggestedPercent}%): Le {formatCurrency(suggestedBudget)}.
+                </p>
+                <div className="grid grid-cols-5 gap-2 sm:flex sm:flex-wrap">
+                  {BUDGET_PERCENT_OPTIONS.map((p) => (
+                    <Button
+                      key={p}
+                      type="button"
+                      variant={suggestedPercent === p ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => applySuggested(p)}
+                      className="min-w-0 sm:min-w-[3rem]"
+                    >
+                      {p}%
+                    </Button>
+                  ))}
+                </div>
+              </>
             )}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+              <input
+                id="baseline"
+                type="number"
+                min="0"
+                step="100"
+                value={baselineCost}
+                onChange={(e) => setBaselineCost(e.target.value)}
+                className="min-w-0 flex-1 rounded-xl border border-muted/30 bg-background px-4 py-2.5 text-foreground outline-none transition-shadow focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+                placeholder="e.g. 500000"
+              />
+              {suggestedBudget > 0 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBaselineCost(String(suggestedBudget))}
+                  className="w-full shrink-0 sm:w-auto sm:min-w-[7.5rem]"
+                >
+                  Use suggested
+                </Button>
+              )}
+            </div>
+            <div className="pt-1">
+              <Button
+                onClick={handleSaveBaseline}
+                disabled={saving}
+                className="w-full"
+                size="sm"
+              >
+                {saving ? "Saving..." : "Save budget"}
+              </Button>
+              <p className="mt-3 text-xs text-muted leading-relaxed">
+                Used to see if you&apos;re on track and to calculate your financial score.
+              </p>
+            </div>
           </div>
-          <Button
-            onClick={handleSaveBaseline}
-            disabled={saving}
-            className="mt-2"
-            size="sm"
-          >
-            {saving ? "Saving..." : "Save budget"}
-          </Button>
-          <p className="mt-1.5 text-xs text-muted">
-            Used to see if you&apos;re on track and to calculate your financial score.
-          </p>
         </div>
       </div>
 

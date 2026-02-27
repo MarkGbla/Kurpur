@@ -169,11 +169,15 @@ export default function InsightsPage() {
     } catch {}
   };
 
-  return isLoading ? (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="h-8 w-8 animate-pulse rounded-full bg-surface-card" />
-    </div>
-  ) : (
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-surface-card" />
+      </div>
+    );
+  }
+
+  return (
     <div className="min-h-screen bg-background px-4 pb-6 pt-6">
       <h1 className="text-2xl font-bold tracking-tight">Insights</h1>
       <p className="mt-0.5 text-sm text-muted">Your financial overview</p>

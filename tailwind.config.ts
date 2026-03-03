@@ -16,7 +16,6 @@ const config: Config = {
         accent: "var(--accent)",
         foreground: "var(--foreground)",
         muted: "var(--muted)",
-        "muted-foreground": "var(--muted-foreground)",
         success: "var(--success)",
         warning: "var(--warning)",
       },

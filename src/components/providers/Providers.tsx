@@ -8,15 +8,14 @@ const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
 
 function PrivyWithTheme({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
-  if (!privyAppId || privyAppId === "placeholder") return null;
   return (
     <PrivyProvider
-      appId={privyAppId}
+      appId={privyAppId!}
       config={{
         loginMethods: ["email", "wallet"],
         appearance: {
-          theme: theme as "light" | "dark",
-          accentColor: theme === "dark" ? "#FFFFFF" : "#171717",
+          theme: theme === "light" ? "light" : "dark",
+          accentColor: theme === "light" ? "#171717" : "#FFFFFF",
         },
         embeddedWallets: {
           solana: {

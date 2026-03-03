@@ -26,9 +26,7 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = React.useState<Theme>(() =>
-    typeof window === "undefined" ? "dark" : getStoredTheme()
-  );
+  const [theme, setThemeState] = React.useState<Theme>("dark");
 
   React.useEffect(() => {
     // Sync with document (set by layout script) so UI matches actual theme
@@ -44,9 +42,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const setTheme = React.useCallback((t: Theme) => {
     setThemeState(t);
     setStoredTheme(t);
-    document.documentElement.className = t;
+    if (typeof document !== "undefined") {
+      document.documentElement.className = t;
+    }
   }, []);
 
+  // Always render the Provider so setTheme is never a no-op (e.g. Light button works)
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}

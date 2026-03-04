@@ -79,10 +79,14 @@ export function usePushNotifications(options: UsePushOptions = {}) {
 
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) as BufferSource,
+        applicationServerKey: urlBase64ToUint8Array(
+          keyData.publicKey
+        ) as BufferSource,
       });
 
-      const token = getAccessToken ? await getAccessToken().catch(() => null) : null;
+      const token = getAccessToken
+        ? await getAccessToken().catch(() => null)
+        : null;
       const subscribeRes = await fetch("/api/push/subscribe", {
         method: "POST",
         headers: {
@@ -93,8 +97,18 @@ export function usePushNotifications(options: UsePushOptions = {}) {
           subscription: {
             endpoint: sub.endpoint,
             keys: {
-              p256dh: btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(sub.getKey("p256dh")!)))),
-              auth: btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(sub.getKey("auth")!)))),
+              p256dh: btoa(
+                String.fromCharCode.apply(
+                  null,
+                  Array.from(new Uint8Array(sub.getKey("p256dh")!))
+                )
+              ),
+              auth: btoa(
+                String.fromCharCode.apply(
+                  null,
+                  Array.from(new Uint8Array(sub.getKey("auth")!))
+                )
+              ),
             },
           },
         }),

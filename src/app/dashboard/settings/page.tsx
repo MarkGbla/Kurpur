@@ -10,7 +10,10 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
-import { SUGGESTED_BUDGET_PERCENT, BUDGET_PERCENT_OPTIONS } from "@/constants/budget";
+import {
+  SUGGESTED_BUDGET_PERCENT,
+  BUDGET_PERCENT_OPTIONS,
+} from "@/constants/budget";
 import type { Transaction } from "@/types/database";
 
 function incomeThisMonth(transactions: Transaction[]): number {
@@ -35,9 +38,13 @@ export default function SettingsPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [suggestedPercent, setSuggestedPercent] = useState(SUGGESTED_BUDGET_PERCENT);
+  const [suggestedPercent, setSuggestedPercent] = useState(
+    SUGGESTED_BUDGET_PERCENT
+  );
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [feedbackType, setFeedbackType] = useState<"suggestion" | "bug">("suggestion");
+  const [feedbackType, setFeedbackType] = useState<"suggestion" | "bug">(
+    "suggestion"
+  );
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
   const [feedbackError, setFeedbackError] = useState<string | null>(null);
@@ -59,11 +66,13 @@ export default function SettingsPage() {
   } = usePushNotifications({ getAccessToken: getAccessToken ?? undefined });
 
   const income = incomeThisMonth(transactions);
-  const suggestedBudget = income > 0 ? Math.floor(income * (suggestedPercent / 100)) : 0;
+  const suggestedBudget =
+    income > 0 ? Math.floor(income * (suggestedPercent / 100)) : 0;
 
   const applySuggested = (percent: number) => {
     setSuggestedPercent(percent);
-    if (income > 0) setBaselineCost(String(Math.floor(income * (percent / 100))));
+    if (income > 0)
+      setBaselineCost(String(Math.floor(income * (percent / 100))));
   };
 
   const loadUser = useCallback(async () => {
@@ -72,7 +81,9 @@ export default function SettingsPage() {
     try {
       const token = await getAccessToken?.().catch(() => null);
       const headers: HeadersInit = { "Content-Type": "application/json" };
-      if (token) (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+      if (token)
+        (headers as Record<string, string>)["Authorization"] =
+          `Bearer ${token}`;
       const [syncRes, txRes] = await Promise.all([
         fetch("/api/auth/sync", {
           method: "POST",
@@ -172,7 +183,9 @@ export default function SettingsPage() {
       setFeedbackSuccess(true);
       setTimeout(() => handleFeedbackOpenChange(false), 1500);
     } catch (err) {
-      setFeedbackError(err instanceof Error ? err.message : "Something went wrong");
+      setFeedbackError(
+        err instanceof Error ? err.message : "Something went wrong"
+      );
     } finally {
       setFeedbackSubmitting(false);
     }
@@ -204,7 +217,9 @@ export default function SettingsPage() {
       setRestartOpen(false);
       await loadUser();
     } catch (err) {
-      setRestartError(err instanceof Error ? err.message : "Something went wrong");
+      setRestartError(
+        err instanceof Error ? err.message : "Something went wrong"
+      );
     } finally {
       setRestartSubmitting(false);
     }
@@ -238,7 +253,9 @@ export default function SettingsPage() {
       logout();
       router.replace("/");
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Something went wrong");
+      setDeleteError(
+        err instanceof Error ? err.message : "Something went wrong"
+      );
     } finally {
       setDeleteSubmitting(false);
     }
@@ -295,13 +312,18 @@ export default function SettingsPage() {
         </div>
         <div className="border-t border-muted/20 pt-5">
           <div className="space-y-4">
-            <label htmlFor="baseline" className="block text-xs font-medium text-muted">
+            <label
+              htmlFor="baseline"
+              className="block text-xs font-medium text-muted"
+            >
               Monthly budget (Le)
             </label>
             {income > 0 && (
               <>
                 <p className="text-xs text-muted leading-relaxed">
-                  Your income this month: Le {formatCurrency(income)}. Suggested budget ({suggestedPercent}%): Le {formatCurrency(suggestedBudget)}.
+                  Your income this month: Le {formatCurrency(income)}. Suggested
+                  budget ({suggestedPercent}%): Le{" "}
+                  {formatCurrency(suggestedBudget)}.
                 </p>
                 <div className="grid grid-cols-5 gap-2 sm:flex sm:flex-wrap">
                   {BUDGET_PERCENT_OPTIONS.map((p) => (
@@ -333,7 +355,13 @@ export default function SettingsPage() {
                 className="min-w-0 flex-1 rounded-xl border border-muted/30 bg-background px-4 py-2.5 text-foreground outline-none transition-shadow focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
                 placeholder="e.g. 500000"
                 aria-invalid={!!saveError}
-                aria-describedby={saveError ? "baseline-error" : saveSuccess ? "baseline-success" : undefined}
+                aria-describedby={
+                  saveError
+                    ? "baseline-error"
+                    : saveSuccess
+                      ? "baseline-success"
+                      : undefined
+                }
               />
               {suggestedBudget > 0 && (
                 <Button
@@ -349,12 +377,20 @@ export default function SettingsPage() {
             </div>
             <div className="pt-1">
               {saveError && (
-                <p id="baseline-error" className="mb-2 text-sm text-warning" role="alert">
+                <p
+                  id="baseline-error"
+                  className="mb-2 text-sm text-warning"
+                  role="alert"
+                >
                   {saveError}
                 </p>
               )}
               {saveSuccess && (
-                <p id="baseline-success" className="mb-2 text-sm text-success" role="status">
+                <p
+                  id="baseline-success"
+                  className="mb-2 text-sm text-success"
+                  role="status"
+                >
                   Budget saved. It will be used on Dashboard and Insights.
                 </p>
               )}
@@ -367,16 +403,16 @@ export default function SettingsPage() {
                 {saving ? "Saving..." : "Save budget"}
               </Button>
               <p className="mt-3 text-xs text-muted leading-relaxed">
-                Your budget is used on the <strong>Dashboard</strong> to show if you&apos;re on track, and in <strong>Insights</strong> to calculate your financial score and recommendations.
+                Your budget is used on the <strong>Dashboard</strong> to show if
+                you&apos;re on track, and in <strong>Insights</strong> to
+                calculate your financial score and recommendations.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {loadError && (
-        <p className="mt-2 text-sm text-warning">{loadError}</p>
-      )}
+      {loadError && <p className="mt-2 text-sm text-warning">{loadError}</p>}
 
       {pushSupported && (
         <div className="mt-6 space-y-4 rounded-2xl bg-surface-card p-4">
@@ -385,14 +421,23 @@ export default function SettingsPage() {
             Get daily summary and reminders (e.g. evening recap). Max 2 per day.
           </p>
           {pushMessage && (
-            <p className={cn(
-              "text-sm",
-              pushStatus === "subscribed" ? "text-success" : pushStatus === "error" || pushStatus === "denied" ? "text-warning" : "text-muted"
-            )}>
+            <p
+              className={cn(
+                "text-sm",
+                pushStatus === "subscribed"
+                  ? "text-success"
+                  : pushStatus === "error" || pushStatus === "denied"
+                    ? "text-warning"
+                    : "text-muted"
+              )}
+            >
               {pushMessage}
             </p>
           )}
-          {(pushStatus === "prompt" || pushStatus === "error" || pushStatus === "unavailable" || pushStatus === "loading") && (
+          {(pushStatus === "prompt" ||
+            pushStatus === "error" ||
+            pushStatus === "unavailable" ||
+            pushStatus === "loading") && (
             <Button
               type="button"
               variant="outline"
@@ -402,20 +447,27 @@ export default function SettingsPage() {
               className="gap-2"
             >
               <Bell className="h-4 w-4" strokeWidth={1.5} />
-              {pushStatus === "loading" ? "Enabling…" : pushStatus === "unavailable" ? "Try enable (install PWA first)" : "Enable notifications"}
+              {pushStatus === "loading"
+                ? "Enabling…"
+                : pushStatus === "unavailable"
+                  ? "Try enable (install PWA first)"
+                  : "Enable notifications"}
             </Button>
           )}
           {pushStatus === "subscribed" && (
             <p className="flex items-center gap-2 text-sm text-success">
               <Bell className="h-4 w-4" strokeWidth={1.5} />
-              Notifications are on. You can disable them in your browser settings.
+              Notifications are on. You can disable them in your browser
+              settings.
             </p>
           )}
           {pushStatus === "unsupported" && (
             <p className="text-sm text-muted">Not available in this browser.</p>
           )}
           {pushStatus === "denied" && (
-            <p className="text-sm text-muted">Allow notifications in your browser to re-enable.</p>
+            <p className="text-sm text-muted">
+              Allow notifications in your browser to re-enable.
+            </p>
           )}
         </div>
       )}
@@ -494,7 +546,10 @@ export default function SettingsPage() {
                 Bug report
               </button>
             </div>
-            <label htmlFor="feedback-message" className="mt-4 block text-sm text-muted">
+            <label
+              htmlFor="feedback-message"
+              className="mt-4 block text-sm text-muted"
+            >
               Message
             </label>
             <textarea
@@ -514,7 +569,9 @@ export default function SettingsPage() {
               <p className="mt-2 text-sm text-warning">{feedbackError}</p>
             )}
             {feedbackSuccess && (
-              <p className="mt-2 text-sm text-success">Thank you! Feedback sent.</p>
+              <p className="mt-2 text-sm text-success">
+                Thank you! Feedback sent.
+              </p>
             )}
             <Button
               onClick={handleFeedbackSubmit}
@@ -536,7 +593,8 @@ export default function SettingsPage() {
           <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(calc(100vw-2rem),24rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-muted/20 bg-surface p-4 shadow-xl outline-none">
             <h2 className="text-lg font-semibold">Restart account</h2>
             <p className="mt-0.5 text-sm text-muted">
-              Clear all transactions and reset your savings. You keep the same account and can start fresh.
+              Clear all transactions and reset your savings. You keep the same
+              account and can start fresh.
             </p>
             {restartError && (
               <p className="mt-2 text-sm text-warning">{restartError}</p>
@@ -570,11 +628,17 @@ export default function SettingsPage() {
             onClick={() => handleDeleteOpenChange(false)}
           />
           <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(calc(100vw-2rem),24rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-muted/20 bg-surface p-4 shadow-xl outline-none">
-            <h2 className="text-lg font-semibold text-red-500">Delete account</h2>
+            <h2 className="text-lg font-semibold text-red-500">
+              Delete account
+            </h2>
             <p className="mt-0.5 text-sm text-muted">
-              This permanently deletes your account and all data. You will need to sign up again to use Kurpur.
+              This permanently deletes your account and all data. You will need
+              to sign up again to use Kurpur.
             </p>
-            <label htmlFor="delete-confirm" className="mt-4 block text-sm text-muted">
+            <label
+              htmlFor="delete-confirm"
+              className="mt-4 block text-sm text-muted"
+            >
               Type <strong>DELETE</strong> to confirm
             </label>
             <input

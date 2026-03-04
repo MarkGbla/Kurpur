@@ -2,7 +2,11 @@
 
 import { motion } from "framer-motion";
 import { Award, Flame, Target, Sun } from "lucide-react";
-import { getLevelFromScore, calculateUsageStreak, hasNoSpendDayRecently } from "@/lib/engagement";
+import {
+  getLevelFromScore,
+  calculateUsageStreak,
+  hasNoSpendDayRecently,
+} from "@/lib/engagement";
 import type { Transaction } from "@/types/database";
 
 interface LevelAndBadgesProps {
@@ -25,9 +29,19 @@ export function LevelAndBadges({
     }))
   );
 
-  const badges: { id: string; label: string; icon: typeof Flame; earned: boolean }[] = [
+  const badges: {
+    id: string;
+    label: string;
+    icon: typeof Flame;
+    earned: boolean;
+  }[] = [
     { id: "streak", label: "7-day streak", icon: Flame, earned: streak >= 7 },
-    { id: "savings", label: "First savings goal", icon: Target, earned: savingsGoalReached },
+    {
+      id: "savings",
+      label: "First savings goal",
+      icon: Target,
+      earned: savingsGoalReached,
+    },
     { id: "nospend", label: "No-spend day", icon: Sun, earned: noSpendDay },
   ];
 
@@ -55,7 +69,9 @@ export function LevelAndBadges({
             <span
               key={b.id}
               className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
-                b.earned ? "bg-success/20 text-success" : "bg-muted/20 text-muted"
+                b.earned
+                  ? "bg-success/20 text-success"
+                  : "bg-muted/20 text-muted"
               }`}
               title={b.earned ? b.label : `Earn: ${b.label}`}
             >

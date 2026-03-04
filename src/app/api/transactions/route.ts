@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getTransactionsByPrivyUserId, createTransaction } from "@/services/transaction.service";
+import {
+  getTransactionsByPrivyUserId,
+  createTransaction,
+} from "@/services/transaction.service";
 import { rateLimit, getRateLimitIdentifier } from "@/lib/rate-limit";
 import { getVerifiedPrivyUserId } from "@/lib/privy-server";
 
@@ -16,10 +19,7 @@ export async function GET(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`transactions-get:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const verifiedUserId = await getVerifiedPrivyUserId(request);
@@ -27,7 +27,10 @@ export async function GET(request: NextRequest) {
   const userId = verifiedUserId ?? queryUserId ?? null;
   if (!userId) {
     return NextResponse.json(
-      { error: "Unauthorized. Send Authorization: Bearer <accessToken> or userId query." },
+      {
+        error:
+          "Unauthorized. Send Authorization: Bearer <accessToken> or userId query.",
+      },
       { status: 401 }
     );
   }
@@ -48,10 +51,7 @@ export async function POST(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`transactions-post:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   try {
@@ -68,7 +68,10 @@ export async function POST(request: NextRequest) {
     const userId = verifiedUserId ?? parsed.data.userId ?? null;
     if (!userId) {
       return NextResponse.json(
-        { error: "Unauthorized. Send Authorization: Bearer <accessToken> or userId in body." },
+        {
+          error:
+            "Unauthorized. Send Authorization: Bearer <accessToken> or userId in body.",
+        },
         { status: 401 }
       );
     }
@@ -82,7 +85,8 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      const message = typeof error === "string" ? error : (error as Error).message;
+      const message =
+        typeof error === "string" ? error : (error as Error).message;
       return NextResponse.json(
         { error: message },
         { status: message === "User not found" ? 404 : 500 }

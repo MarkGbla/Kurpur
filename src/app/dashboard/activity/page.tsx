@@ -4,7 +4,14 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
-import { TrendingUp, TrendingDown, Search, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Search,
+  MoreVertical,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import type { Transaction } from "@/types/database";
@@ -34,7 +41,10 @@ function EditTransactionLink({
 
 type FilterRange = "week" | "month" | "all";
 
-function filterByRange(transactions: Transaction[], range: FilterRange): Transaction[] {
+function filterByRange(
+  transactions: Transaction[],
+  range: FilterRange
+): Transaction[] {
   if (range === "all") return transactions;
   const now = new Date();
   const cutoff = new Date(now);
@@ -43,7 +53,10 @@ function filterByRange(transactions: Transaction[], range: FilterRange): Transac
   return transactions.filter((t) => new Date(t.timestamp) >= cutoff);
 }
 
-function searchFilter(transactions: Transaction[], query: string): Transaction[] {
+function searchFilter(
+  transactions: Transaction[],
+  query: string
+): Transaction[] {
   if (!query.trim()) return transactions;
   const q = query.trim().toLowerCase();
   return transactions.filter(
@@ -67,7 +80,8 @@ export default function ActivityPage() {
     if (!user?.id) return;
     const token = await getAccessToken?.().catch(() => null);
     const headers: HeadersInit = {};
-    if (token) (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+    if (token)
+      (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
     const r = await fetch(`/api/transactions?userId=${user.id}`, { headers });
     const d = await r.json();
     setTransactions(d.transactions ?? []);
@@ -79,7 +93,9 @@ export default function ActivityPage() {
     fetchTransactions().finally(() => {
       if (!cancelled) setIsLoading(false);
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [user?.id, fetchTransactions]);
 
   const filtered = useMemo(() => {
@@ -105,7 +121,8 @@ export default function ActivityPage() {
 
   const runningBalances = useMemo(() => {
     const sorted = [...transactions].sort(
-      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
     );
     let running = 0;
     const map: Record<string, number> = {};
@@ -134,8 +151,12 @@ export default function ActivityPage() {
   const handleDelete = async (id: string) => {
     const token = await getAccessToken?.().catch(() => null);
     const headers: HeadersInit = { "Content-Type": "application/json" };
-    if (token) (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
-    const res = await fetch(`/api/transactions/${id}`, { method: "DELETE", headers });
+    if (token)
+      (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`/api/transactions/${id}`, {
+      method: "DELETE",
+      headers,
+    });
     if (res.ok) {
       setDeleteConfirmId(null);
       setMenuOpenId(null);
@@ -179,7 +200,10 @@ export default function ActivityPage() {
       {isLoading ? (
         <div className="mt-6 space-y-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl bg-surface-card" />
+            <div
+              key={i}
+              className="h-16 animate-pulse rounded-xl bg-surface-card"
+            />
           ))}
         </div>
       ) : dateKeys.length === 0 ? (
@@ -233,7 +257,8 @@ export default function ActivityPage() {
                           </p>
                         )}
                         <p className="mt-0.5 text-xs text-muted">
-                          Balance: Le {formatCurrency(runningBalances[t.id] ?? 0)}
+                          Balance: Le{" "}
+                          {formatCurrency(runningBalances[t.id] ?? 0)}
                         </p>
                       </div>
                     </div>
@@ -243,7 +268,8 @@ export default function ActivityPage() {
                           t.type === "income" ? "text-success" : "text-warning"
                         }`}
                       >
-                        {t.type === "income" ? "+" : "-"}Le {formatCurrency(Number(t.amount))}
+                        {t.type === "income" ? "+" : "-"}Le{" "}
+                        {formatCurrency(Number(t.amount))}
                       </p>
                       <div className="relative">
                         <button

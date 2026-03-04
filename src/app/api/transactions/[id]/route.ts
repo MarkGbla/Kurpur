@@ -12,7 +12,9 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> | { id: string } }
 ) {
-  const params = await (Promise.resolve(context.params) as Promise<{ id: string }>);
+  const params = await (Promise.resolve(context.params) as Promise<{
+    id: string;
+  }>);
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`transactions-get-id:${id}`);
   if (!success) {
@@ -29,14 +31,22 @@ export async function GET(
 
   const transactionId = params.id;
   if (!transactionId) {
-    return NextResponse.json({ error: "Transaction ID required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Transaction ID required" },
+      { status: 400 }
+    );
   }
 
-  const { transaction, error } = await getTransactionById(verifiedUserId, transactionId);
+  const { transaction, error } = await getTransactionById(
+    verifiedUserId,
+    transactionId
+  );
   if (error || !transaction) {
     return NextResponse.json(
       { error: error ?? "Not found" },
-      { status: error === "User not found" || error === "Not found" ? 404 : 500 }
+      {
+        status: error === "User not found" || error === "Not found" ? 404 : 500,
+      }
     );
   }
   return NextResponse.json({ transaction });
@@ -53,7 +63,9 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> | { id: string } }
 ) {
-  const params = await (Promise.resolve(context.params) as Promise<{ id: string }>);
+  const params = await (Promise.resolve(context.params) as Promise<{
+    id: string;
+  }>);
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`transactions-patch:${id}`);
   if (!success) {
@@ -70,7 +82,10 @@ export async function PATCH(
 
   const transactionId = params.id;
   if (!transactionId) {
-    return NextResponse.json({ error: "Transaction ID required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Transaction ID required" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -92,13 +107,19 @@ export async function PATCH(
     if (error) {
       return NextResponse.json(
         { error },
-        { status: error === "User not found" || error === "Not found" ? 404 : 500 }
+        {
+          status:
+            error === "User not found" || error === "Not found" ? 404 : 500,
+        }
       );
     }
     return NextResponse.json({ transaction });
   } catch (err) {
     console.error("Transaction update error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -106,7 +127,9 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> | { id: string } }
 ) {
-  const params = await (Promise.resolve(context.params) as Promise<{ id: string }>);
+  const params = await (Promise.resolve(context.params) as Promise<{
+    id: string;
+  }>);
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`transactions-delete:${id}`);
   if (!success) {
@@ -123,14 +146,19 @@ export async function DELETE(
 
   const transactionId = params.id;
   if (!transactionId) {
-    return NextResponse.json({ error: "Transaction ID required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Transaction ID required" },
+      { status: 400 }
+    );
   }
 
   const { error } = await deleteTransaction(verifiedUserId, transactionId);
   if (error) {
     return NextResponse.json(
       { error },
-      { status: error === "User not found" || error === "Not found" ? 404 : 500 }
+      {
+        status: error === "User not found" || error === "Not found" ? 404 : 500,
+      }
     );
   }
   return NextResponse.json({ success: true });

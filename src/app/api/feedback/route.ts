@@ -13,26 +13,23 @@ export async function POST(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`feedback:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
   const parsed = CreateFeedbackSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.flatten().fieldErrors.message?.[0] ?? "Invalid input" },
+      {
+        error:
+          parsed.error.flatten().fieldErrors.message?.[0] ?? "Invalid input",
+      },
       { status: 400 }
     );
   }

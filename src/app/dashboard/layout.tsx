@@ -48,7 +48,8 @@ export default function DashboardLayout({
               href={href}
               className={cn(
                 "flex flex-col items-center gap-0.5 rounded-xl px-4 py-2 transition-colors",
-                pathname === href || (href !== "/dashboard" && pathname.startsWith(href))
+                pathname === href ||
+                  (href !== "/dashboard" && pathname.startsWith(href))
                   ? "text-accent"
                   : "text-muted"
               )}

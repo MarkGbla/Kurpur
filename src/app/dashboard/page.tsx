@@ -35,9 +35,13 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [saveSheetOpen, setSaveSheetOpen] = useState(false);
-  const [addSheetInitialType, setAddSheetInitialType] = useState<"income" | "expense">("expense");
+  const [addSheetInitialType, setAddSheetInitialType] = useState<
+    "income" | "expense"
+  >("expense");
   const [saveSheetInitialAmount, setSaveSheetInitialAmount] = useState(0);
-  const [editTransactionId, setEditTransactionId] = useState<string | null>(null);
+  const [editTransactionId, setEditTransactionId] = useState<string | null>(
+    null
+  );
   const searchParams = useSearchParams();
 
   const fetchData = useCallback(async () => {
@@ -192,11 +196,13 @@ export default function DashboardPage() {
           <LevelAndBadges
             financialScore={financialScore}
             transactions={transactions}
-            savingsGoalReached={(userData?.savingsBalance ?? 0) >= (userData?.savingsTarget ?? 1000)}
+            savingsGoalReached={
+              (userData?.savingsBalance ?? 0) >=
+              (userData?.savingsTarget ?? 1000)
+            }
           />
         )}
       </section>
-
 
       <AddTransactionSheet
         open={sheetOpen}

@@ -71,20 +71,33 @@ export async function getTransactionById(
   const rows = (await sql`
     SELECT * FROM transactions WHERE user_id = ${user.id} AND id = ${transactionId} LIMIT 1
   `) as Transaction[];
-  return { transaction: rows[0] ?? null, error: rows.length === 0 ? "Not found" : undefined };
+  return {
+    transaction: rows[0] ?? null,
+    error: rows.length === 0 ? "Not found" : undefined,
+  };
 }
 
 export async function updateTransaction(
   privyUserId: string,
   transactionId: string,
-  params: { type?: "income" | "expense"; category?: string; amount?: number; note?: string | null }
+  params: {
+    type?: "income" | "expense";
+    category?: string;
+    amount?: number;
+    note?: string | null;
+  }
 ) {
-  const { transaction: existing, error: fetchErr } = await getTransactionById(privyUserId, transactionId);
-  if (fetchErr || !existing) return { transaction: null, error: fetchErr ?? "Not found" };
+  const { transaction: existing, error: fetchErr } = await getTransactionById(
+    privyUserId,
+    transactionId
+  );
+  if (fetchErr || !existing)
+    return { transaction: null, error: fetchErr ?? "Not found" };
 
   const type = params.type ?? existing.type;
   const category = params.category ?? existing.category;
-  const amount = params.amount !== undefined ? params.amount : Number(existing.amount);
+  const amount =
+    params.amount !== undefined ? params.amount : Number(existing.amount);
   const note = params.note !== undefined ? params.note : existing.note;
 
   const sql = getNeonDb();
@@ -113,5 +126,7 @@ export async function deleteTransaction(
     WHERE user_id = ${user.id} AND id = ${transactionId}
     RETURNING id
   `;
-  return { error: (result as { id: string }[]).length === 0 ? "Not found" : undefined };
+  return {
+    error: (result as { id: string }[]).length === 0 ? "Not found" : undefined,
+  };
 }

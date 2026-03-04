@@ -25,10 +25,7 @@ export async function POST(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`push-send:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const body = await request.json().catch(() => ({}));
@@ -46,10 +43,7 @@ export async function POST(request: NextRequest) {
     url: parsed.data.url,
   });
   if (error) {
-    return NextResponse.json(
-      { error },
-      { status: 503 }
-    );
+    return NextResponse.json({ error }, { status: 503 });
   }
   return NextResponse.json({ sent });
 }

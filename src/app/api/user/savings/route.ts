@@ -13,10 +13,7 @@ export async function GET(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`user-savings:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const verifiedUserId = await getVerifiedPrivyUserId(request);
@@ -24,7 +21,10 @@ export async function GET(request: NextRequest) {
   const userId = verifiedUserId ?? queryUserId ?? null;
   if (!userId) {
     return NextResponse.json(
-      { error: "Unauthorized. Send Authorization: Bearer <accessToken> or userId query." },
+      {
+        error:
+          "Unauthorized. Send Authorization: Bearer <accessToken> or userId query.",
+      },
       { status: 401 }
     );
   }
@@ -37,10 +37,7 @@ export async function PATCH(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`user-savings-patch:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   try {
@@ -59,7 +56,10 @@ export async function PATCH(request: NextRequest) {
     const userId = verifiedUserId ?? parsed.data.userId ?? null;
     if (!userId) {
       return NextResponse.json(
-        { error: "Unauthorized. Send Authorization: Bearer <accessToken> or userId in body." },
+        {
+          error:
+            "Unauthorized. Send Authorization: Bearer <accessToken> or userId in body.",
+        },
         { status: 401 }
       );
     }

@@ -7,7 +7,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Kurpur - Daily Financial Companion",
-  description: "Build disciplined financial habits. Simple. Premium. Essential.",
+  description:
+    "Build disciplined financial habits. Simple. Premium. Essential.",
   manifest: "/manifest.json",
   icons: {
     icon: [

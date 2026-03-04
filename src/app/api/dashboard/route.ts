@@ -19,26 +19,30 @@ export async function POST(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`dashboard:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   try {
     const verifiedUserId = await getVerifiedPrivyUserId(request);
     const body = await request.json().catch(() => ({}));
     const parsed = DashboardSchema.safeParse(body);
-    const privyUserId = verifiedUserId ?? (parsed.success ? parsed.data.privyUserId : null);
+    const privyUserId =
+      verifiedUserId ?? (parsed.success ? parsed.data.privyUserId : null);
     if (!privyUserId) {
       return NextResponse.json(
-        { error: "Unauthorized. Send Authorization: Bearer <accessToken> or privyUserId in body." },
+        {
+          error:
+            "Unauthorized. Send Authorization: Bearer <accessToken> or privyUserId in body.",
+        },
         { status: 401 }
       );
     }
     const email = parsed.success ? parsed.data.email : undefined;
 
-    const { user, error: syncError } = await syncUser(privyUserId, email ?? undefined);
+    const { user, error: syncError } = await syncUser(
+      privyUserId,
+      email ?? undefined
+    );
     if (syncError) {
       console.error("Dashboard sync error:", syncError);
       return NextResponse.json(

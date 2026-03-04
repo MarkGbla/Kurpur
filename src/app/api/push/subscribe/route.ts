@@ -18,10 +18,7 @@ export async function POST(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`push-subscribe:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const verifiedUserId = await getVerifiedPrivyUserId(request);
@@ -41,7 +38,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { error } = await saveSubscription(verifiedUserId, parsed.data.subscription);
+  const { error } = await saveSubscription(
+    verifiedUserId,
+    parsed.data.subscription
+  );
   if (error) {
     return NextResponse.json(
       { error },

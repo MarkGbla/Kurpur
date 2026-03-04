@@ -19,7 +19,9 @@ import type { Transaction } from "@/types/database";
 function ScoreHowCalculated({
   breakdown,
 }: {
-  breakdown: { factors: { label: string; impact: number; description: string }[] };
+  breakdown: {
+    factors: { label: string; impact: number; description: string }[];
+  };
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -51,9 +53,14 @@ function ScoreHowCalculated({
                   <span className="text-right">
                     {f.description}
                     {f.impact !== 0 && (
-                      <span className={f.impact > 0 ? "text-success" : "text-warning"}>
+                      <span
+                        className={
+                          f.impact > 0 ? "text-success" : "text-warning"
+                        }
+                      >
                         {" "}
-                        ({f.impact > 0 ? "+" : ""}{f.impact})
+                        ({f.impact > 0 ? "+" : ""}
+                        {f.impact})
                       </span>
                     )}
                   </span>
@@ -70,11 +77,15 @@ function ScoreHowCalculated({
 export default function InsightsPage() {
   const { user, getAccessToken } = usePrivy();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [savings, setSavings] = useState({ virtualBalance: 0, batchThreshold: 1000 });
-  const [userInfo, setUserInfo] = useState<{ baseline_cost: number } | null>(null);
+  const [savings, setSavings] = useState({
+    virtualBalance: 0,
+    batchThreshold: 1000,
+  });
+  const [userInfo, setUserInfo] = useState<{ baseline_cost: number } | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [shareCopied, setShareCopied] = useState(false);
-
 
   useEffect(() => {
     if (!user?.id) return;
@@ -82,14 +93,19 @@ export default function InsightsPage() {
     const run = async () => {
       const token = await getAccessToken?.().catch(() => null);
       const headers: HeadersInit = { "Content-Type": "application/json" };
-      if (token) (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+      if (token)
+        (headers as Record<string, string>)["Authorization"] =
+          `Bearer ${token}`;
       const [txRes, savingsRes, syncRes] = await Promise.all([
         fetch(`/api/transactions?userId=${user.id}`, { headers }),
         fetch(`/api/user/savings?userId=${user.id}`, { headers }),
         fetch("/api/auth/sync", {
           method: "POST",
           headers,
-          body: JSON.stringify({ privyUserId: user.id, email: user.email?.address }),
+          body: JSON.stringify({
+            privyUserId: user.id,
+            email: user.email?.address,
+          }),
         }),
       ]);
       if (cancelled) return;
@@ -110,8 +126,12 @@ export default function InsightsPage() {
           : null
       );
     };
-    run().finally(() => { if (!cancelled) setIsLoading(false); });
-    return () => { cancelled = true; };
+    run().finally(() => {
+      if (!cancelled) setIsLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [user?.id, user?.email?.address, getAccessToken]);
 
   const { income, expense } = calculateBalance(transactions);
@@ -143,7 +163,11 @@ export default function InsightsPage() {
   const now = new Date();
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   const daysRemaining = Math.max(0, lastDay.getDate() - now.getDate());
-  const projectedEOM = getProjectedEndOfMonthBalance(balance, burnRate, daysRemaining);
+  const projectedEOM = getProjectedEndOfMonthBalance(
+    balance,
+    burnRate,
+    daysRemaining
+  );
   const { thisWeek, lastWeek } = getWeekOverWeekSpending(transactions);
   const dailyTrend7 = getDailyExpenseTrend(transactions, 7);
   const maxDaily = Math.max(1, ...dailyTrend7.map((d) => d.amount));
@@ -158,7 +182,10 @@ export default function InsightsPage() {
             ? "Needs work"
             : "At risk";
 
-  const monthName = now.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+  const monthName = now.toLocaleDateString("en-GB", {
+    month: "long",
+    year: "numeric",
+  });
   const shareSummary = `Kurpur · ${monthName}\nIncome: Le ${formatCurrency(income)}\nExpense: Le ${formatCurrency(expense)}\nScore: ${score}/100`;
 
   const handleCopySummary = async () => {
@@ -209,7 +236,7 @@ export default function InsightsPage() {
           </p>
           {(userInfo?.baseline_cost ?? 0) > 0 ? (
             <p className="mt-2 text-xs text-muted">
-              Monthly budget: Le {formatCurrency(userInfo.baseline_cost)}
+              Monthly budget: Le {formatCurrency(userInfo?.baseline_cost ?? 0)}
             </p>
           ) : (
             <p className="mt-2 text-xs text-muted">
@@ -297,11 +324,14 @@ export default function InsightsPage() {
           className="rounded-2xl bg-surface-card p-6"
         >
           <p className="text-sm text-muted">Projected end of month</p>
-          <p className={`mt-1 text-2xl font-bold ${projectedEOM >= 0 ? "text-success" : "text-warning"}`}>
+          <p
+            className={`mt-1 text-2xl font-bold ${projectedEOM >= 0 ? "text-success" : "text-warning"}`}
+          >
             Le {formatCurrency(projectedEOM)}
           </p>
           <p className="mt-1 text-xs text-muted">
-            At current burn rate (Le {formatCurrency(burnRate)}/day), {daysRemaining} days left
+            At current burn rate (Le {formatCurrency(burnRate)}/day),{" "}
+            {daysRemaining} days left
           </p>
         </motion.div>
 

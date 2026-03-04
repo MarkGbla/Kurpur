@@ -21,9 +21,12 @@ export function SpendingOverview({
   categoryTotals = {},
 }: SpendingOverviewProps) {
   const totalExpense = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
-  const over70 = totalExpense > 0
-    ? Object.entries(categoryTotals).find(([, amt]) => (amt / totalExpense) * 100 > 70)
-    : null;
+  const over70 =
+    totalExpense > 0
+      ? Object.entries(categoryTotals).find(
+          ([, amt]) => (amt / totalExpense) * 100 > 70
+        )
+      : null;
 
   return (
     <motion.div
@@ -69,8 +72,10 @@ export function SpendingOverview({
         <div className="mt-2 flex items-center gap-2 rounded-lg bg-warning/15 px-2.5 py-2 text-xs text-warning">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <span>
-            <span className="font-medium capitalize">{over70[0].replace(/_/g, " ")}</span> is{" "}
-            {((over70[1] / totalExpense) * 100).toFixed(0)}% of spending
+            <span className="font-medium capitalize">
+              {over70[0].replace(/_/g, " ")}
+            </span>{" "}
+            is {((over70[1] / totalExpense) * 100).toFixed(0)}% of spending
           </span>
         </div>
       )}

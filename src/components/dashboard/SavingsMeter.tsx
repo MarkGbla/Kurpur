@@ -14,13 +14,21 @@ interface SavingsMeterProps {
   onSaveNow?: () => void;
 }
 
-function getProjectedDate(balance: number, target: number, dailyRate: number): string | null {
+function getProjectedDate(
+  balance: number,
+  target: number,
+  dailyRate: number
+): string | null {
   if (dailyRate <= 0 || balance >= target) return null;
   const remaining = target - balance;
   const days = Math.ceil(remaining / dailyRate);
   const d = new Date();
   d.setDate(d.getDate() + days);
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export function SavingsMeter({
@@ -30,8 +38,13 @@ export function SavingsMeter({
   dailySavingsRate = 0,
   onSaveNow,
 }: SavingsMeterProps) {
-  const progress = target > 0 ? Math.min(100, (virtualBalance / target) * 100) : 0;
-  const projectedDate = getProjectedDate(virtualBalance, target, dailySavingsRate);
+  const progress =
+    target > 0 ? Math.min(100, (virtualBalance / target) * 100) : 0;
+  const projectedDate = getProjectedDate(
+    virtualBalance,
+    target,
+    dailySavingsRate
+  );
 
   return (
     <motion.div

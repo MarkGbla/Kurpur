@@ -65,13 +65,19 @@ export function InstallPrompt() {
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as unknown as { prompt: () => Promise<{ outcome: string }> });
+      setDeferredPrompt(
+        e as unknown as { prompt: () => Promise<{ outcome: string }> }
+      );
       setIosMode(false);
       setOpen(true);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    return () =>
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
   }, [mounted]);
 
   const handleInstall = async () => {
@@ -100,7 +106,10 @@ export function InstallPrompt() {
   if (!showPrompt) return null;
 
   return (
-    <Dialog.Root open={open} onOpenChange={(isOpen) => !isOpen && handleDismiss()}>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(isOpen) => !isOpen && handleDismiss()}
+    >
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
         <Dialog.Content
@@ -112,17 +121,27 @@ export function InstallPrompt() {
             {iosMode ? (
               <>
                 <p className="mt-1.5 text-sm text-muted">
-                  Add Kurpur to your home screen for quick access and a better experience.
+                  Add Kurpur to your home screen for quick access and a better
+                  experience.
                 </p>
                 <ol className="mt-4 list-decimal space-y-2 pl-4 text-sm text-muted">
-                  <li>Tap the <Share className="inline h-4 w-4 -mt-0.5" strokeWidth={1.5} aria-hidden /> Share button (bottom in Safari).</li>
+                  <li>
+                    Tap the{" "}
+                    <Share
+                      className="inline h-4 w-4 -mt-0.5"
+                      strokeWidth={1.5}
+                      aria-hidden
+                    />{" "}
+                    Share button (bottom in Safari).
+                  </li>
                   <li>Scroll and tap &ldquo;Add to Home Screen&rdquo;.</li>
                   <li>Tap &ldquo;Add&rdquo; in the top right.</li>
                 </ol>
               </>
             ) : (
               <p className="mt-1.5 text-sm text-muted">
-                Add the app to your home screen for quick access and a better experience.
+                Add the app to your home screen for quick access and a better
+                experience.
               </p>
             )}
             <div className="mt-5 flex min-h-[44px] flex-col gap-2">

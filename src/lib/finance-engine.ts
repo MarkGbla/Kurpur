@@ -13,10 +13,19 @@ export function calculateBurnRate(
   return days > 0 ? total / days : 0;
 }
 
-export type ScoreFactor = "budget_adherence" | "savings_consistency" | "spending_distribution" | "activity";
+export type ScoreFactor =
+  | "budget_adherence"
+  | "savings_consistency"
+  | "spending_distribution"
+  | "activity";
 export interface ScoreBreakdown {
   score: number;
-  factors: { id: ScoreFactor; label: string; impact: number; description: string }[];
+  factors: {
+    id: ScoreFactor;
+    label: string;
+    impact: number;
+    description: string;
+  }[];
   recommendation: string | null;
 }
 
@@ -70,7 +79,8 @@ export function computeFinancialScoreBreakdown(
     });
   }
 
-  const savingsImpact = savingsBalance > 0 ? Math.min(15, Math.floor(savingsBalance / 500)) : 0;
+  const savingsImpact =
+    savingsBalance > 0 ? Math.min(15, Math.floor(savingsBalance / 500)) : 0;
   if (savingsImpact > 0) {
     score += savingsImpact;
     factors.push({
@@ -130,9 +140,11 @@ export function computeFinancialScoreBreakdown(
   return { score: finalScore, factors, recommendation };
 }
 
-export function calculateBalance(
-  transactions: Transaction[]
-): { total: number; income: number; expense: number } {
+export function calculateBalance(transactions: Transaction[]): {
+  total: number;
+  income: number;
+  expense: number;
+} {
   let income = 0;
   let expense = 0;
   for (const t of transactions) {
@@ -162,9 +174,10 @@ export function getProjectedEndOfMonthBalance(
 }
 
 /** Spending totals for this week and previous week. */
-export function getWeekOverWeekSpending(
-  transactions: Transaction[]
-): { thisWeek: number; lastWeek: number } {
+export function getWeekOverWeekSpending(transactions: Transaction[]): {
+  thisWeek: number;
+  lastWeek: number;
+} {
   const now = new Date();
   const startThisWeek = new Date(now);
   startThisWeek.setDate(now.getDate() - now.getDay());

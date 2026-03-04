@@ -62,11 +62,7 @@ export function BudgetCard({
   const ratio = dailyBudget > 0 ? burnRate / dailyBudget : 0;
   const onTrack = ratio <= 1;
   const statusText =
-    ratio <= 0.8
-      ? "Under budget"
-      : ratio <= 1
-        ? "On track"
-        : "Over budget";
+    ratio <= 0.8 ? "Under budget" : ratio <= 1 ? "On track" : "Over budget";
 
   return (
     <motion.div
@@ -84,11 +80,7 @@ export function BudgetCard({
       <p className="mt-1 text-xs text-muted">
         Le {formatCurrency(burnRate)}/day burn
         {dailyBudget > 0 && (
-          <span
-            className={
-              onTrack ? "text-success" : "text-warning"
-            }
-          >
+          <span className={onTrack ? "text-success" : "text-warning"}>
             {" "}
             · {statusText}
           </span>

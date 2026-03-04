@@ -13,10 +13,7 @@ export async function PATCH(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`user-patch:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   try {
@@ -35,7 +32,10 @@ export async function PATCH(request: NextRequest) {
     const userId = verifiedUserId ?? parsed.data.userId ?? null;
     if (!userId) {
       return NextResponse.json(
-        { error: "Unauthorized. Send Authorization: Bearer <accessToken> or userId in body." },
+        {
+          error:
+            "Unauthorized. Send Authorization: Bearer <accessToken> or userId in body.",
+        },
         { status: 401 }
       );
     }

@@ -22,15 +22,20 @@ self.addEventListener("push", function (event) {
 
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
-  var url = event.notification.data && event.notification.data.url ? event.notification.data.url : "/dashboard";
+  var url =
+    event.notification.data && event.notification.data.url
+      ? event.notification.data.url
+      : "/dashboard";
   event.waitUntil(
-    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (clientList) {
-      if (clientList.length > 0 && clientList[0].focus) {
-        clientList[0].navigate(url);
-        clientList[0].focus();
-      } else if (self.clients.openWindow) {
-        self.clients.openWindow(url);
-      }
-    })
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then(function (clientList) {
+        if (clientList.length > 0 && clientList[0].focus) {
+          clientList[0].navigate(url);
+          clientList[0].focus();
+        } else if (self.clients.openWindow) {
+          self.clients.openWindow(url);
+        }
+      })
   );
 });

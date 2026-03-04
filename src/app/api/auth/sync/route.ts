@@ -13,20 +13,21 @@ export async function POST(request: NextRequest) {
   const id = getRateLimitIdentifier(request);
   const { success } = rateLimit(`auth-sync:${id}`);
   if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   try {
     const verifiedUserId = await getVerifiedPrivyUserId(request);
     const body = await request.json().catch(() => ({}));
     const parsed = SyncSchema.safeParse(body);
-    const privyUserId = verifiedUserId ?? (parsed.success ? parsed.data.privyUserId : null);
+    const privyUserId =
+      verifiedUserId ?? (parsed.success ? parsed.data.privyUserId : null);
     if (!privyUserId) {
       return NextResponse.json(
-        { error: "Unauthorized. Send Authorization: Bearer <accessToken> or privyUserId in body." },
+        {
+          error:
+            "Unauthorized. Send Authorization: Bearer <accessToken> or privyUserId in body.",
+        },
         { status: 401 }
       );
     }
@@ -36,10 +37,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("User sync error:", error);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ user });

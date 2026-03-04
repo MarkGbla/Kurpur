@@ -24,12 +24,20 @@ interface AddTransactionSheetProps {
   editTransactionId?: string | null;
 }
 
-function getLastUsed(): { type: "income" | "expense"; category: string; amount: string } | null {
+function getLastUsed(): {
+  type: "income" | "expense";
+  category: string;
+  amount: string;
+} | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(LAST_USED_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as { type?: string; category?: string; amount?: string };
+    const parsed = JSON.parse(raw) as {
+      type?: string;
+      category?: string;
+      amount?: string;
+    };
     if (parsed?.type === "income" || parsed?.type === "expense") {
       return {
         type: parsed.type,
@@ -41,9 +49,16 @@ function getLastUsed(): { type: "income" | "expense"; category: string; amount: 
   return null;
 }
 
-function setLastUsed(type: "income" | "expense", category: string, amount: string) {
+function setLastUsed(
+  type: "income" | "expense",
+  category: string,
+  amount: string
+) {
   try {
-    localStorage.setItem(LAST_USED_KEY, JSON.stringify({ type, category, amount }));
+    localStorage.setItem(
+      LAST_USED_KEY,
+      JSON.stringify({ type, category, amount })
+    );
   } catch {}
 }
 
@@ -77,15 +92,24 @@ export function AddTransactionSheet({
           })
         )
         .then((r) => r.json())
-        .then((data: { transaction?: { type: string; category: string; amount: number; note: string | null } }) => {
-          const t = data.transaction;
-          if (t) {
-            setType(t.type === "income" ? "income" : "expense");
-            setCategory(t.category ?? "");
-            setAmount(String(t.amount ?? 0));
-            setNote(t.note ?? "");
+        .then(
+          (data: {
+            transaction?: {
+              type: string;
+              category: string;
+              amount: number;
+              note: string | null;
+            };
+          }) => {
+            const t = data.transaction;
+            if (t) {
+              setType(t.type === "income" ? "income" : "expense");
+              setCategory(t.category ?? "");
+              setAmount(String(t.amount ?? 0));
+              setNote(t.note ?? "");
+            }
           }
-        })
+        )
         .catch(() => setError("Failed to load transaction"))
         .finally(() => setLoadingEdit(false));
       return;
@@ -106,10 +130,15 @@ export function AddTransactionSheet({
   }, [open, initialType, editTransactionId, privyUserId, getAccessToken]);
 
   const items = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
-  const isOtherCategory = category && OTHER_CATEGORY_IDS.includes(category as (typeof OTHER_CATEGORY_IDS)[number]);
+  const isOtherCategory =
+    category &&
+    OTHER_CATEGORY_IDS.includes(
+      category as (typeof OTHER_CATEGORY_IDS)[number]
+    );
 
   const handleAmountKey = (key: string) => {
-    if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
+    if (typeof navigator !== "undefined" && navigator.vibrate)
+      navigator.vibrate(10);
     if (key === "clear") {
       setAmount("0");
       return;
@@ -195,125 +224,153 @@ export function AddTransactionSheet({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => onOpenChange(false)} />
+        <Dialog.Overlay
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          onClick={() => onOpenChange(false)}
+        />
         <Dialog.Content className="fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-2xl border-t border-muted/20 bg-surface outline-none">
-            <div className="sticky top-0 z-10 flex justify-center bg-surface py-3">
-              <div className="h-1.5 w-12 rounded-full bg-muted/40" />
-            </div>
-            <div className="px-4 pb-8">
-              <h2 className="text-xl font-semibold">
-                {loadingEdit ? "Loading..." : isEdit ? "Edit Transaction" : "Add Transaction"}
-              </h2>
+          <div className="sticky top-0 z-10 flex justify-center bg-surface py-3">
+            <div className="h-1.5 w-12 rounded-full bg-muted/40" />
+          </div>
+          <div className="px-4 pb-8">
+            <h2 className="text-xl font-semibold">
+              {loadingEdit
+                ? "Loading..."
+                : isEdit
+                  ? "Edit Transaction"
+                  : "Add Transaction"}
+            </h2>
 
-              <div className="mt-4 flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setType("income");
-                    setCategory("");
-                    setNote("");
-                  }}
-                  className={cn(
-                    "flex-1 rounded-xl py-2.5 text-sm font-medium transition-colors",
-                    type === "income"
-                      ? "bg-success/20 text-success"
-                      : "bg-surface-card text-muted"
-                  )}
-                >
-                  Income
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setType("expense");
-                    setCategory("");
-                    setNote("");
-                  }}
-                  className={cn(
-                    "flex-1 rounded-xl py-2.5 text-sm font-medium transition-colors",
-                    type === "expense"
-                      ? "bg-warning/20 text-warning"
-                      : "bg-surface-card text-muted"
-                  )}
-                >
-                  Expense
-                </button>
-              </div>
-
-              <p className="mt-4 text-sm text-muted">Category</p>
-              <div className="mt-2 grid grid-cols-4 gap-2">
-                {items.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => {
-                      setCategory(item.id);
-                      if (!OTHER_CATEGORY_IDS.includes(item.id as (typeof OTHER_CATEGORY_IDS)[number])) {
-                        setNote("");
-                      }
-                    }}
-                    className={cn(
-                      "rounded-xl py-2.5 text-sm font-medium transition-all active:scale-0.97 ring-2 ring-transparent",
-                      category === item.id
-                        ? "bg-accent text-background ring-accent ring-offset-2 ring-offset-surface"
-                        : "bg-surface-card text-muted hover:bg-surface-card/80"
-                    )}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-
-              {isOtherCategory && (
-                <div className="mt-4">
-                  <p className="text-sm text-muted">
-                    {type === "income" ? "Where did this come from?" : "What was this for?"}{" "}
-                    <span className="font-normal text-muted/80">(optional)</span>
-                  </p>
-                  <input
-                    type="text"
-                    value={note}
-                    onChange={(e) => setNote(e.target.value.slice(0, OTHER_NOTE_MAX_LENGTH))}
-                    maxLength={OTHER_NOTE_MAX_LENGTH}
-                    placeholder={type === "income" ? "e.g. Sold old phone" : "e.g. One-off purchase"}
-                    className="mt-2 w-full rounded-xl border border-muted/30 bg-surface-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                  />
-                  <p className="mt-1 text-xs text-muted">{note.length}/{OTHER_NOTE_MAX_LENGTH}</p>
-                </div>
-              )}
-
-              <p className="mt-4 text-sm text-muted">Amount (Le)</p>
-              <div className="mt-2 flex items-center justify-between rounded-xl bg-surface-card px-4 py-3">
-                <span className="text-2xl font-bold tracking-tight">
-                  Le {formatCurrency(parseFloat(amount) || 0)}
-                </span>
-              </div>
-
-              <div className="mt-4 grid grid-cols-3 gap-2">
-                {keypad.flat().map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => handleAmountKey(key)}
-                    className="flex h-14 items-center justify-center rounded-xl bg-surface-card text-lg font-medium transition-transform active:scale-0.95"
-                  >
-                    {key === "back" ? "\u232B" : key}
-                  </button>
-                ))}
-              </div>
-
-              {error && (
-                <p className="mt-3 text-sm text-warning">{error}</p>
-              )}
-
-              <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting || loadingEdit || parseFloat(amount) <= 0 || !category}
-                className="mt-6 w-full py-3"
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setType("income");
+                  setCategory("");
+                  setNote("");
+                }}
+                className={cn(
+                  "flex-1 rounded-xl py-2.5 text-sm font-medium transition-colors",
+                  type === "income"
+                    ? "bg-success/20 text-success"
+                    : "bg-surface-card text-muted"
+                )}
               >
-                {isSubmitting ? "Saving..." : isEdit ? "Update Transaction" : "Add Transaction"}
-              </Button>
+                Income
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setType("expense");
+                  setCategory("");
+                  setNote("");
+                }}
+                className={cn(
+                  "flex-1 rounded-xl py-2.5 text-sm font-medium transition-colors",
+                  type === "expense"
+                    ? "bg-warning/20 text-warning"
+                    : "bg-surface-card text-muted"
+                )}
+              >
+                Expense
+              </button>
             </div>
+
+            <p className="mt-4 text-sm text-muted">Category</p>
+            <div className="mt-2 grid grid-cols-4 gap-2">
+              {items.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    setCategory(item.id);
+                    if (
+                      !OTHER_CATEGORY_IDS.includes(
+                        item.id as (typeof OTHER_CATEGORY_IDS)[number]
+                      )
+                    ) {
+                      setNote("");
+                    }
+                  }}
+                  className={cn(
+                    "rounded-xl py-2.5 text-sm font-medium transition-all active:scale-0.97 ring-2 ring-transparent",
+                    category === item.id
+                      ? "bg-accent text-background ring-accent ring-offset-2 ring-offset-surface"
+                      : "bg-surface-card text-muted hover:bg-surface-card/80"
+                  )}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {isOtherCategory && (
+              <div className="mt-4">
+                <p className="text-sm text-muted">
+                  {type === "income"
+                    ? "Where did this come from?"
+                    : "What was this for?"}{" "}
+                  <span className="font-normal text-muted/80">(optional)</span>
+                </p>
+                <input
+                  type="text"
+                  value={note}
+                  onChange={(e) =>
+                    setNote(e.target.value.slice(0, OTHER_NOTE_MAX_LENGTH))
+                  }
+                  maxLength={OTHER_NOTE_MAX_LENGTH}
+                  placeholder={
+                    type === "income"
+                      ? "e.g. Sold old phone"
+                      : "e.g. One-off purchase"
+                  }
+                  className="mt-2 w-full rounded-xl border border-muted/30 bg-surface-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+                <p className="mt-1 text-xs text-muted">
+                  {note.length}/{OTHER_NOTE_MAX_LENGTH}
+                </p>
+              </div>
+            )}
+
+            <p className="mt-4 text-sm text-muted">Amount (Le)</p>
+            <div className="mt-2 flex items-center justify-between rounded-xl bg-surface-card px-4 py-3">
+              <span className="text-2xl font-bold tracking-tight">
+                Le {formatCurrency(parseFloat(amount) || 0)}
+              </span>
+            </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              {keypad.flat().map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => handleAmountKey(key)}
+                  className="flex h-14 items-center justify-center rounded-xl bg-surface-card text-lg font-medium transition-transform active:scale-0.95"
+                >
+                  {key === "back" ? "\u232B" : key}
+                </button>
+              ))}
+            </div>
+
+            {error && <p className="mt-3 text-sm text-warning">{error}</p>}
+
+            <Button
+              onClick={handleSubmit}
+              disabled={
+                isSubmitting ||
+                loadingEdit ||
+                parseFloat(amount) <= 0 ||
+                !category
+              }
+              className="mt-6 w-full py-3"
+            >
+              {isSubmitting
+                ? "Saving..."
+                : isEdit
+                  ? "Update Transaction"
+                  : "Add Transaction"}
+            </Button>
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

@@ -50,7 +50,12 @@ export function AddTransactionFAB({
 
   return (
     <>
-      <div className={cn("fixed bottom-20 right-4 z-30 flex flex-col items-end gap-2", className)}>
+      <div
+        className={cn(
+          "fixed bottom-20 right-4 z-30 flex flex-col items-end gap-2",
+          className
+        )}
+      >
         <AnimatePresence>
           {showTooltip && !open && (
             <motion.div
@@ -90,7 +95,10 @@ export function AddTransactionFAB({
                 className="flex items-center gap-3 rounded-xl bg-warning/15 px-4 py-3 text-left transition-colors hover:bg-warning/25"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-warning/30">
-                  <TrendingDown className="h-5 w-5 text-warning" strokeWidth={1.5} />
+                  <TrendingDown
+                    className="h-5 w-5 text-warning"
+                    strokeWidth={1.5}
+                  />
                 </div>
                 <div>
                   <p className="font-medium">Add Expense</p>
@@ -103,7 +111,10 @@ export function AddTransactionFAB({
                 className="flex items-center gap-3 rounded-xl bg-success/15 px-4 py-3 text-left transition-colors hover:bg-success/25"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-success/30">
-                  <TrendingUp className="h-5 w-5 text-success" strokeWidth={1.5} />
+                  <TrendingUp
+                    className="h-5 w-5 text-success"
+                    strokeWidth={1.5}
+                  />
                 </div>
                 <div>
                   <p className="font-medium">Add Income</p>
@@ -116,7 +127,10 @@ export function AddTransactionFAB({
                 className="flex items-center gap-3 rounded-xl bg-surface-card px-4 py-3 text-left transition-colors hover:bg-surface-card/80"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-success/20">
-                  <PiggyBank className="h-5 w-5 text-success" strokeWidth={1.5} />
+                  <PiggyBank
+                    className="h-5 w-5 text-success"
+                    strokeWidth={1.5}
+                  />
                 </div>
                 <div>
                   <p className="font-medium">Add Savings</p>

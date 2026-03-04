@@ -125,7 +125,9 @@ export function SaveNowSheet({
               disabled={isSubmitting || numAmount <= 0}
               className="mt-6 w-full py-3"
             >
-              {isSubmitting ? "Saving..." : "Save Le " + formatCurrency(numAmount)}
+              {isSubmitting
+                ? "Saving..."
+                : "Save Le " + formatCurrency(numAmount)}
             </Button>
           </div>
         </Dialog.Content>

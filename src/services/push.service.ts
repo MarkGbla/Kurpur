@@ -78,11 +78,7 @@ export async function sendPushToUser(
 ): Promise<{ sent: number; error?: string }> {
   try {
     const { publicKey, privateKey } = getVapidKeys();
-    webpush.setVapidDetails(
-      "mailto:support@kurpur.app",
-      publicKey,
-      privateKey
-    );
+    webpush.setVapidDetails("mailto:support@kurpur.app", publicKey, privateKey);
   } catch (e) {
     return { sent: 0, error: "Push not configured" };
   }

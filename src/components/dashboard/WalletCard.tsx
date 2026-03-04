@@ -30,17 +30,38 @@ export function WalletCard({
       className="relative overflow-hidden rounded-[1.25rem] bg-[#0d0d0d] shadow-xl"
     >
       {/* Decorative curved lines (Kurpur brand pattern) */}
-      <div className="absolute inset-0 overflow-hidden rounded-[1.25rem]" aria-hidden>
+      <div
+        className="absolute inset-0 overflow-hidden rounded-[1.25rem]"
+        aria-hidden
+      >
         <svg
           className="absolute -right-12 -top-8 h-[280px] w-[280px] opacity-90"
           viewBox="0 0 200 200"
           fill="none"
         >
           <defs>
-            <linearGradient id="kurpur-lines" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgb(34 211 238)" stopOpacity="0.35" />
-              <stop offset="50%" stopColor="rgb(148 163 184)" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="rgb(255 255 255)" stopOpacity="0.08" />
+            <linearGradient
+              id="kurpur-lines"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop
+                offset="0%"
+                stopColor="rgb(34 211 238)"
+                stopOpacity="0.35"
+              />
+              <stop
+                offset="50%"
+                stopColor="rgb(148 163 184)"
+                stopOpacity="0.2"
+              />
+              <stop
+                offset="100%"
+                stopColor="rgb(255 255 255)"
+                stopOpacity="0.08"
+              />
             </linearGradient>
           </defs>
           {Array.from({ length: 28 }).map((_, i) => (
@@ -69,7 +90,9 @@ export function WalletCard({
                 aria-hidden
               />
             </div>
-            <span className="text-sm font-medium tracking-wide text-white/95">Kurpur</span>
+            <span className="text-sm font-medium tracking-wide text-white/95">
+              Kurpur
+            </span>
           </div>
           {onAddClick && (
             <button

@@ -99,4 +99,5 @@ export interface Database {
 
 export type User = Database["public"]["Tables"]["users"]["Row"];
 export type Transaction = Database["public"]["Tables"]["transactions"]["Row"];
-export type SavingsLedger = Database["public"]["Tables"]["savings_ledger"]["Row"];
+export type SavingsLedger =
+  Database["public"]["Tables"]["savings_ledger"]["Row"];

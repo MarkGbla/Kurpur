@@ -2,13 +2,11 @@ import { getNeonDb } from "@/lib/neon";
 
 export type FeedbackType = "suggestion" | "bug";
 
-export async function createFeedback(
-  params: {
-    privyUserId?: string | null;
-    type: FeedbackType;
-    message: string;
-  }
-) {
+export async function createFeedback(params: {
+  privyUserId?: string | null;
+  type: FeedbackType;
+  message: string;
+}) {
   const sql = getNeonDb();
 
   await sql`

@@ -1,12 +1,7 @@
-const path = require("path");
-
 /** @type {import('postcss-load-config').Config} */
-const config = {
+module.exports = {
   plugins: {
-    tailwindcss: {
-      config: path.join(__dirname, "tailwind.config.js"),
-    },
+    tailwindcss: {},
+    autoprefixer: {},
   },
 };
-
-module.exports = config;

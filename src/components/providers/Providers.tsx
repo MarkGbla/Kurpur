@@ -35,8 +35,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
         <p className="text-center text-muted">
-          Privy is not configured. Add <code className="rounded bg-surface-card px-1.5 py-0.5">NEXT_PUBLIC_PRIVY_APP_ID</code> to your{" "}
-          <code className="rounded bg-surface-card px-1.5 py-0.5">.env.local</code>.
+          Privy is not configured. Add{" "}
+          <code className="rounded bg-surface-card px-1.5 py-0.5">
+            NEXT_PUBLIC_PRIVY_APP_ID
+          </code>{" "}
+          to your{" "}
+          <code className="rounded bg-surface-card px-1.5 py-0.5">
+            .env.local
+          </code>
+          .
         </p>
       </div>
     );

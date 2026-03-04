@@ -6,10 +6,7 @@ import {
   detectSavingsMilestone,
   calculateUsageStreak,
 } from "@/lib/engagement";
-import {
-  calculateBalance,
-  calculateBurnRate,
-} from "@/lib/finance-engine";
+import { calculateBalance, calculateBurnRate } from "@/lib/finance-engine";
 import type { Transaction } from "@/types/database";
 
 interface EngagementBannerProps {
@@ -35,9 +32,7 @@ export function EngagementBanner({
   const burnRate = calculateBurnRate(transactions, 7);
   const burnVsBaseline = baselineCost > 0 ? burnRate / baselineCost : 0;
   const savingsGrowth = savingsBalance - previousSavingsBalance;
-  const streak = calculateUsageStreak(
-    transactions.map((t) => t.timestamp)
-  );
+  const streak = calculateUsageStreak(transactions.map((t) => t.timestamp));
 
   const milestone = detectSavingsMilestone(
     savingsBalance,

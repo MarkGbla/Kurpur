@@ -13,6 +13,7 @@
     --muted: #8a8a8a;
     --success: #22c55e;
     --warning: #f59e0b;
+    --border: rgba(138, 138, 138, 0.2);
   }
 
   .light {
@@ -24,13 +25,17 @@
     --muted: #737373;
     --success: #16a34a;
     --warning: #d97706;
+    --border: rgba(115, 115, 115, 0.2);
   }
 
   * {
-    @apply border-muted/20;
+    border-color: var(--border);
   }
 
   body {
-    @apply bg-background text-accent antialiased;
+    background-color: var(--background);
+    color: var(--accent);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
